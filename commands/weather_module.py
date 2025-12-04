@@ -2,6 +2,8 @@
 
 import os
 import json
+from datetime import datetime
+from collections import Counter
 import discord
 from discord.ext import commands
 import aiohttp
@@ -138,9 +140,6 @@ class WeatherModule(BaseModule):
         Returns:
             List of daily forecast dictionaries with date, temps, and conditions
         """
-        from datetime import datetime
-        from collections import Counter
-
         daily_forecasts = {}
 
         # Process each 3-hour interval
@@ -340,8 +339,6 @@ class WeatherModule(BaseModule):
 
     async def forecast_command(self, ctx, zip_code: str = None):
         """Display 5-day weather forecast."""
-        from datetime import datetime
-
         user_id = str(ctx.author.id)
 
         # If no zip code provided, try to use saved location
