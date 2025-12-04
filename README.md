@@ -36,6 +36,7 @@ See [DOCKER.md](DOCKER.md) for complete Docker documentation.
 - `!setlocation` command to save your location for quick weather lookups
 - `!search` command for DuckDuckGo searches
 - `!quote` command to search and display quotes from a database
+- `!friday` command to celebrate Fridays with Rebecca Black (only works on Fridays!)
 - User location persistence across bot restarts
 - Ignores its own messages to prevent infinite loops
 - Simple and lightweight
@@ -50,6 +51,7 @@ The bot uses a modular system where you can enable or disable features individua
 | `count` | Display nice count statistics | `!count` |
 | `search` | DuckDuckGo search integration | `!search` |
 | `quote` | Search and display quotes from database | `!quote` |
+| `friday` | Friday celebration (Rebecca Black video) | `!friday` |
 | `nice_trigger` | Responds "Nice!" to messages containing "nice" | (automatic trigger) |
 | `shutup_trigger` | Responds "No, u!" to messages containing "shut up" | (automatic trigger) |
 | `eagles_trigger` | Random Eagles chants for messages containing "eagles" | (automatic trigger) |
@@ -106,6 +108,7 @@ pip install -r requirements.txt
        "count",
        "search",
        "quote",
+       "friday",
        "nice_trigger",
        "shutup_trigger",
        "eagles_trigger"
@@ -182,6 +185,7 @@ To enable all modules, include all available module names:
     "count",
     "search",
     "quote",
+    "friday",
     "nice_trigger",
     "shutup_trigger",
     "eagles_trigger"
@@ -195,6 +199,7 @@ Some modules have additional configuration options:
 
 - `eagles_cooldown`: Time in seconds between Eagles responses per channel (default: 600 = 10 minutes)
 - `eagles_cleanup_days`: Days to keep channel timestamps before cleanup (default: 7 days)
+- `friday_cleanup_days`: Days to keep Friday usage records before cleanup (default: 30 days)
 - `weather_api_key`: Required for the weather module to work
 
 ### Module Dependencies
@@ -379,6 +384,45 @@ Examples:
 The bot will search for quotes containing your keyword and display a random matching result with the quote ID.
 
 **Quote Database**: Quotes are stored in `data/quotes.json` (1,008 quotes total). The bot will display how many matching quotes were found for your search term.
+
+### Friday Command
+
+Celebrate Friday with Rebecca Black's iconic video!
+
+```
+!friday
+```
+
+**Special Rules:**
+- ✅ **Only works on Fridays** - The bot checks the day of the week
+- ✅ **Once per channel per Friday** - Each channel can post it once, then must wait until next Friday
+- 🎉 **Automatic reset** - At midnight, the countdown starts again for the next Friday
+
+**Example responses:**
+
+On Friday (first use):
+```
+🎉 It's Friday, Friday! 🎉
+Gotta get down on Friday! 🎵
+
+https://www.youtube.com/watch?v=kfVsfOSbJY0
+
+Everybody's lookin' forward to the weekend! 🎊
+```
+
+On Friday (already used):
+```
+⏸️ Hold up! This channel already got its Friday fix today!
+Come back next Friday for more fun, fun, fun, fun! 😄
+```
+
+On any other day:
+```
+❌ It's not Friday yet! Today is Wednesday.
+Come back in 2 days when the weekend arrives! 🗓️
+```
+
+**Note:** The bot uses server time to determine if it's Friday. The video link is automatically tracked per channel and resets weekly.
 
 ## Security Note
 
