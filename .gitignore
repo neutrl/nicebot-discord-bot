@@ -1,0 +1,31 @@
+# Bot data
+nice_counts.json
+data/
+
+# Config files with secrets
+config.json
+
+# Docker
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+dist/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment variables
+.env

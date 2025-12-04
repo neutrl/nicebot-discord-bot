@@ -1,0 +1,16 @@
+services:
+  discord-bot:
+    build: .
+    container_name: nice-discord-bot
+    restart: unless-stopped
+    volumes:
+      # Mount config file (read-only)
+      - ./config.json:/app/config.json:ro
+      # Mount data directory for persistent counts
+      - ./data:/app/data
+    environment:
+      # Fallback to environment variable if config.json not used
+      - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN:-}
+    # Uncomment below to see logs in real-time
+    # stdin_open: true
+    # tty: true

@@ -1,0 +1,332 @@
+# Discord "Nice" Bot
+
+A simple Discord bot that responds with "Nice!" whenever a user says "nice" in any message, responds with "No, u!" when someone says "shut up", and shows team spirit with randomized Eagles responses when someone mentions "eagles".
+
+## 🐳 Quick Start with Docker
+
+**Recommended for easy deployment!**
+
+```bash
+# 1. Set up your token
+cp config.example.json config.json
+# Edit config.json with your bot token
+
+# 2. Run with Docker
+docker-compose up -d
+
+# 3. View logs
+docker-compose logs -f
+```
+
+See [DOCKER.md](DOCKER.md) for complete Docker documentation.
+
+## Features
+
+- **Modular Design**: Enable/disable features via config.json
+- Responds "Nice!" to any message containing the word "nice" (case-insensitive)
+- Responds "No, u!" to any message containing "shut up" (case-insensitive)
+- Responds with randomized Eagles responses to any message containing "eagles" (case-insensitive)
+  - Includes: "Go Birds!", "da birds!", "E.A.G.L.E.S", "Fly Eagles Fly!", and more
+  - 10-minute cooldown between responses to prevent spam
+- Tracks the number of "Nice!" responses per server and per channel
+- Persists counts to a file so they survive bot restarts
+- `!count` command to display statistics
+- `!weather` command to check weather by zip code
+- `!setlocation` command to save your location for quick weather lookups
+- `!search` command for DuckDuckGo searches
+- User location persistence across bot restarts
+- Ignores its own messages to prevent infinite loops
+- Simple and lightweight
+
+## Available Modules
+
+The bot uses a modular system where you can enable or disable features individually:
+
+| Module Name | Description | Commands |
+|-------------|-------------|----------|
+| `weather` | Weather lookup and location management | `!weather`, `!setlocation` |
+| `count` | Display nice count statistics | `!count` |
+| `search` | DuckDuckGo search integration | `!search` |
+| `nice_trigger` | Responds "Nice!" to messages containing "nice" | (automatic trigger) |
+| `shutup_trigger` | Responds "No, u!" to messages containing "shut up" | (automatic trigger) |
+| `eagles_trigger` | Random Eagles chants for messages containing "eagles" | (automatic trigger) |
+
+## Setup Instructions
+
+> **💡 Tip**: If you have Docker installed, see the [Quick Start with Docker](#-quick-start-with-docker) section above for easier deployment!
+
+### Manual Setup
+
+### 1. Create a Discord Bot
+
+1. Go to the [Discord Developer Portal](https://discord.com/developers/applications)
+2. Click "New Application" and give it a name
+3. Go to the "Bot" section in the left sidebar
+4. Click "Add Bot"
+5. Under "Privileged Gateway Intents", enable:
+   - **Message Content Intent** (required for the bot to read messages)
+6. Click "Reset Token" and copy your bot token (keep this secret!)
+
+### 2. Invite the Bot to Your Server
+
+1. In the Developer Portal, go to "OAuth2" > "URL Generator"
+2. Select the following scopes:
+   - `bot`
+3. Select the following bot permissions:
+   - `Send Messages`
+   - `Read Messages/View Channels`
+4. Copy the generated URL and open it in your browser
+5. Select the server you want to add the bot to
+
+### 3. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Set Your Bot Token and Weather API Key
+
+#### Option 1: Config File (Recommended)
+
+1. Copy the example config file:
+   ```bash
+   cp config.example.json config.json
+   ```
+
+2. Edit `config.json` and add your bot token, weather API key, and enabled modules:
+   ```json
+   {
+     "bot_token": "your-discord-bot-token-here",
+     "weather_api_key": "your-openweathermap-api-key-here",
+     "enabled_modules": [
+       "weather",
+       "count",
+       "search",
+       "nice_trigger",
+       "shutup_trigger",
+       "eagles_trigger"
+     ],
+     "eagles_cooldown": 600
+   }
+   ```
+
+3. Get a free OpenWeatherMap API key:
+   - Go to [OpenWeatherMap](https://openweathermap.org/api)
+   - Sign up for a free account
+   - Navigate to "API keys" in your account settings
+   - Copy your API key and add it to `config.json`
+   - Note: The weather API key is optional - the bot will work without it, but weather commands will not be available
+
+#### Option 2: Environment Variable
+
+Set your Discord bot token as an environment variable:
+
+**Linux/Mac:**
+```bash
+export DISCORD_BOT_TOKEN='your-token-here'
+```
+
+**Windows (Command Prompt):**
+```cmd
+set DISCORD_BOT_TOKEN=your-token-here
+```
+
+**Windows (PowerShell):**
+```powershell
+$env:DISCORD_BOT_TOKEN='your-token-here'
+```
+
+**Note:** The bot will try to load from `config.json` first, then fall back to the environment variable.
+
+### 5. Run the Bot
+
+```bash
+python discord_bot.py
+```
+
+You should see a message saying the bot has connected to Discord!
+
+## Configuring Modules
+
+The bot uses a modular system that allows you to enable or disable features individually. This is controlled by the `enabled_modules` array in your `config.json` file.
+
+### Enabling/Disabling Modules
+
+To disable a module, simply remove it from the `enabled_modules` array in `config.json`. For example, to disable the search and eagles trigger:
+
+```json
+{
+  "bot_token": "your-token-here",
+  "weather_api_key": "your-api-key-here",
+  "enabled_modules": [
+    "weather",
+    "count",
+    "nice_trigger",
+    "shutup_trigger"
+  ]
+}
+```
+
+To enable all modules, include all available module names:
+
+```json
+{
+  "bot_token": "your-token-here",
+  "weather_api_key": "your-api-key-here",
+  "enabled_modules": [
+    "weather",
+    "count",
+    "search",
+    "nice_trigger",
+    "shutup_trigger",
+    "eagles_trigger"
+  ]
+}
+```
+
+### Module Configuration Options
+
+Some modules have additional configuration options:
+
+- `eagles_cooldown`: Time in seconds between Eagles responses (default: 600 = 10 minutes)
+- `weather_api_key`: Required for the weather module to work
+
+### Module Dependencies
+
+Note: The `nice_trigger` module tracks counts that the `count` module displays. If you want to use `!count`, you should also enable `nice_trigger`.
+
+## Usage
+
+Once the bot is running and in your server:
+
+### Responding to "nice"
+
+1. Type any message containing "nice" in a channel the bot can see
+2. The bot will respond with "Nice!" and increment the counter
+
+Examples:
+- User: "nice"
+- Bot: "Nice!"
+
+- User: "That's really nice!"
+- Bot: "Nice!"
+
+- User: "NICE work!"
+- Bot: "Nice!"
+
+### Responding to "shut up"
+
+The bot has a playful response to "shut up":
+
+Examples:
+- User: "shut up"
+- Bot: "No, u!"
+
+- User: "Oh shut up bot"
+- Bot: "No, u!"
+
+### Responding to "eagles"
+
+The bot shows team spirit with randomized responses when "eagles" is mentioned (with a 10-minute cooldown):
+
+Examples:
+- User: "eagles"
+- Bot: "Go Birds!" (or "da birds!", "E.A.G.L.E.S", "Fly Eagles Fly!", "Bleed green!", etc.)
+
+- User: "Let's go Eagles!"
+- Bot: "E-A-G-L-E-S EAGLES!"
+
+- User: "Did you see the Eagles game?"
+- Bot: "da birds!"
+
+**Note:** The bot will only respond once every 10 minutes to prevent spam, but each response is randomly selected from a variety of Eagles chants and phrases.
+
+### Checking Statistics
+
+Use the `!count` command to see statistics:
+
+```
+!count
+```
+
+This will display:
+- Number of "nice" responses in the current channel
+- Total number of "nice" responses in the server
+- Breakdown by channel (top 10 channels shown)
+
+The counts are saved automatically and will persist even if the bot restarts.
+
+### Weather Commands
+
+The bot can fetch weather information for US zip codes (requires OpenWeatherMap API key):
+
+#### Check Weather by Zip Code
+
+```
+!weather 10001
+```
+
+This will display:
+- Current temperature (°F)
+- Feels like temperature
+- Weather description
+- Humidity percentage
+- Wind speed
+
+#### Save Your Location
+
+Save your zip code to quickly check weather without typing it each time:
+
+```
+!setlocation 10001
+```
+
+After setting your location, you can use `!weather` without a zip code:
+
+```
+!weather
+```
+
+The bot will automatically use your saved location. User locations are saved and persist across bot restarts.
+
+### Search Command
+
+The bot can perform DuckDuckGo searches directly in Discord:
+
+```
+!search python discord bot
+```
+
+This will display:
+- Top 5 search results
+- Title, description, and link for each result
+- Formatted in an easy-to-read embed
+
+Example:
+```
+!search how to make pizza
+```
+
+The bot will search DuckDuckGo and display the top 5 results with links.
+
+## Security Note
+
+Never share your bot token or API keys publicly! If you accidentally expose them, regenerate them immediately.
+
+**Important:**
+- The `config.json` file is included in `.gitignore` to prevent accidentally committing your tokens and API keys to version control
+- Use `config.example.json` as a template - never commit your actual `config.json` file
+- Keep your bot token and weather API key secure and treat them like passwords
+- If you expose your Discord bot token, regenerate it in the Discord Developer Portal
+- If you expose your OpenWeatherMap API key, regenerate it in your OpenWeatherMap account settings
+
+## Troubleshooting
+
+- **Bot doesn't respond**: Make sure "Message Content Intent" is enabled in the Discord Developer Portal
+- **Bot can't connect**: Verify your token is set correctly
+- **Permission errors**: Ensure the bot has "Send Messages" and "Read Messages/View Channels" permissions in your server
+- **Weather command not working**:
+  - Verify you have added your OpenWeatherMap API key to `config.json`
+  - Check that your API key is active (new keys can take a few minutes to activate)
+  - Ensure you're using a valid 5-digit US zip code
+  - Free tier API keys have a rate limit (60 calls/minute)

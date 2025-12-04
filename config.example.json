@@ -1,0 +1,13 @@
+{
+  "bot_token": "your-discord-bot-token-here",
+  "weather_api_key": "your-openweathermap-api-key-here",
+  "enabled_modules": [
+    "weather",
+    "count",
+    "search",
+    "nice_trigger",
+    "shutup_trigger",
+    "eagles_trigger"
+  ],
+  "eagles_cooldown": 600
+}
