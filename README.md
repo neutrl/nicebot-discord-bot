@@ -27,7 +27,7 @@ See [DOCKER.md](DOCKER.md) for complete Docker documentation.
 - Responds "No, u!" to any message containing "shut up" (case-insensitive)
 - Responds with randomized Eagles responses to any message containing "eagles" (case-insensitive)
   - Includes: "Go Birds!", "da birds!", "E.A.G.L.E.S", "Fly Eagles Fly!", and more
-  - 10-minute cooldown between responses to prevent spam
+  - 10-minute per-channel cooldown to prevent spam (each channel independent)
 - Tracks the number of "Nice!" responses per server and per channel
 - Persists counts to a file so they survive bot restarts
 - `!count` command to display statistics
@@ -192,7 +192,8 @@ To enable all modules, include all available module names:
 
 Some modules have additional configuration options:
 
-- `eagles_cooldown`: Time in seconds between Eagles responses (default: 600 = 10 minutes)
+- `eagles_cooldown`: Time in seconds between Eagles responses per channel (default: 600 = 10 minutes)
+- `eagles_cleanup_days`: Days to keep channel timestamps before cleanup (default: 7 days)
 - `weather_api_key`: Required for the weather module to work
 
 ### Module Dependencies
@@ -231,7 +232,7 @@ Examples:
 
 ### Responding to "eagles"
 
-The bot shows team spirit with randomized responses when "eagles" is mentioned (with a 10-minute cooldown):
+The bot shows team spirit with randomized responses when "eagles" is mentioned (with a 10-minute per-channel cooldown):
 
 Examples:
 - User: "eagles"
@@ -243,7 +244,7 @@ Examples:
 - User: "Did you see the Eagles game?"
 - Bot: "da birds!"
 
-**Note:** The bot will only respond once every 10 minutes to prevent spam, but each response is randomly selected from a variety of Eagles chants and phrases.
+**Note:** The bot will only respond once every 10 minutes **per channel** to prevent spam. Each channel has its own independent cooldown, so #general and #sports can both enjoy Eagles responses separately. Each response is randomly selected from a variety of Eagles chants and phrases.
 
 ### Checking Statistics
 
