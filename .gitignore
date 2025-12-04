@@ -1,34 +1,112 @@
-# Bot data
-nice_counts.json
-data/
+# ===========================================
+# Discord Bot .gitignore
+# ===========================================
 
-# Config files with secrets
+# Bot Configuration (contains secrets!)
+# =====================================
 config.json
-
-# Docker
 .env
 
-# Claude
-.claude/
+# Bot Data (user data, stats, state)
+# ===================================
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+# ====
+*.log
+logs/
 
 # Python
+# ======
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.Python
+
+# Virtual environments
 env/
 venv/
 ENV/
+.venv/
+
+# Distribution / packaging
 build/
 dist/
 *.egg-info/
+*.egg
 
-# IDE
+# Unit test / coverage reports
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# pyenv
+.python-version
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# IDEs and Editors
+# ================
+# Visual Studio Code
 .vscode/
+
+# PyCharm / IntelliJ
 .idea/
+
+# Vim
 *.swp
 *.swo
+*~
 
-# Environment variables
-.env
+# Emacs
+*~
+\#*\#
+.\#*
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# macOS
+# =====
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+# =======
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+# =====
+.directory
+
+# Docker
+# ======
+docker-compose.override.yml
+
+# Temporary files
+# ===============
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Claude Code
+# ===========
+.claude/
