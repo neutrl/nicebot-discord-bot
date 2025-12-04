@@ -34,6 +34,7 @@ See [DOCKER.md](DOCKER.md) for complete Docker documentation.
 - `!weather` command to check weather by zip code
 - `!setlocation` command to save your location for quick weather lookups
 - `!search` command for DuckDuckGo searches
+- `!quote` command to search and display quotes from a database
 - User location persistence across bot restarts
 - Ignores its own messages to prevent infinite loops
 - Simple and lightweight
@@ -47,6 +48,7 @@ The bot uses a modular system where you can enable or disable features individua
 | `weather` | Weather lookup and location management | `!weather`, `!setlocation` |
 | `count` | Display nice count statistics | `!count` |
 | `search` | DuckDuckGo search integration | `!search` |
+| `quote` | Search and display quotes from database | `!quote` |
 | `nice_trigger` | Responds "Nice!" to messages containing "nice" | (automatic trigger) |
 | `shutup_trigger` | Responds "No, u!" to messages containing "shut up" | (automatic trigger) |
 | `eagles_trigger` | Random Eagles chants for messages containing "eagles" | (automatic trigger) |
@@ -102,6 +104,7 @@ pip install -r requirements.txt
        "weather",
        "count",
        "search",
+       "quote",
        "nice_trigger",
        "shutup_trigger",
        "eagles_trigger"
@@ -177,6 +180,7 @@ To enable all modules, include all available module names:
     "weather",
     "count",
     "search",
+    "quote",
     "nice_trigger",
     "shutup_trigger",
     "eagles_trigger"
@@ -308,6 +312,49 @@ Example:
 ```
 
 The bot will search DuckDuckGo and display the top 5 results with links.
+
+### Quote Command
+
+The bot can search and display quotes from a JSON database:
+
+#### Random Quote
+
+To get a random quote, simply use:
+
+```
+!quote
+```
+
+#### Search Quotes by ID
+
+To retrieve a specific quote by its ID number:
+
+```
+!quote 42
+```
+
+This will display quote #42 exactly.
+
+#### Search Quotes by Keyword
+
+To search for specific quotes by keyword:
+
+```
+!quote programming
+```
+
+This will search through the quote text and return a random matching quote.
+
+Examples:
+```
+!quote neutral
+!quote eagles
+!quote nice
+```
+
+The bot will search for quotes containing your keyword and display a random matching result with the quote ID.
+
+**Quote Database**: Quotes are stored in `data/quotes.json` (1,008 quotes total). The bot will display how many matching quotes were found for your search term.
 
 ## Security Note
 

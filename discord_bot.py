@@ -39,6 +39,7 @@ def load_module(module_name: str, config: dict):
             'weather': ('commands.weather_module', 'WeatherModule'),
             'count': ('commands.count_module', 'CountModule'),
             'search': ('commands.search_module', 'SearchModule'),
+            'quote': ('commands.quote_module', 'QuoteModule'),
             'nice_trigger': ('commands.nice_trigger', 'NiceTriggerModule'),
             'shutup_trigger': ('commands.shutup_trigger', 'ShutUpTriggerModule'),
             'eagles_trigger': ('commands.eagles_trigger', 'EaglesTriggerModule'),
