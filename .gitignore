@@ -8,6 +8,9 @@ config.json
 # Docker
 .env
 
+# Claude
+.claude/
+
 # Python
 __pycache__/
 *.py[cod]
