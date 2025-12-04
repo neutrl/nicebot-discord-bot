@@ -23,7 +23,7 @@ class WeatherModule(BaseModule):
 
     @property
     def description(self) -> str:
-        return "Weather lookup commands (!weather, !setlocation)"
+        return "Weather lookup commands (!weather, !forecast, !setlocation)"
 
     async def setup(self):
         """Set up the weather module."""
@@ -38,9 +38,14 @@ class WeatherModule(BaseModule):
         async def setlocation_cmd(ctx, zip_code: str):
             await self.setlocation_command(ctx, zip_code)
 
+        @commands.command(name='forecast')
+        async def forecast_cmd(ctx, zip_code: str = None):
+            await self.forecast_command(ctx, zip_code)
+
         # Add commands to bot
         self.bot.add_command(weather_cmd)
         self.bot.add_command(setlocation_cmd)
+        self.bot.add_command(forecast_cmd)
 
         print(f"✓ Loaded module: {self.name}")
 
@@ -48,6 +53,7 @@ class WeatherModule(BaseModule):
         """Clean up the weather module."""
         self.save_locations()
         self.bot.remove_command('weather')
+        self.bot.remove_command('forecast')
         self.bot.remove_command('setlocation')
 
     def load_locations(self):
@@ -94,6 +100,90 @@ class WeatherModule(BaseModule):
                         return None, f"Weather service error (status {response.status})"
         except Exception as e:
             return None, f"Error fetching weather: {str(e)}"
+
+    async def fetch_forecast(self, zip_code, country_code='US'):
+        """Fetch 5-day forecast data from OpenWeatherMap API."""
+        if not self.weather_api_key:
+            return None, "Weather API key not configured. Please add 'weather_api_key' to config.json"
+
+        url = f"http://api.openweathermap.org/data/2.5/forecast"
+        params = {
+            'zip': f"{zip_code},{country_code}",
+            'appid': self.weather_api_key,
+            'units': 'imperial'  # Use Fahrenheit
+        }
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, params=params) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        return data, None
+                    elif response.status == 404:
+                        return None, "Invalid zip code. Please check and try again."
+                    elif response.status == 401:
+                        return None, "Invalid API key. Please check your OpenWeatherMap API key."
+                    else:
+                        return None, f"Forecast service error (status {response.status})"
+        except Exception as e:
+            return None, f"Error fetching forecast: {str(e)}"
+
+    def aggregate_daily_forecast(self, forecast_data):
+        """
+        Aggregate 3-hour forecast intervals into daily summaries.
+
+        Args:
+            forecast_data: Raw forecast data from API
+
+        Returns:
+            List of daily forecast dictionaries with date, temps, and conditions
+        """
+        from datetime import datetime
+        from collections import Counter
+
+        daily_forecasts = {}
+
+        # Process each 3-hour interval
+        for entry in forecast_data['list']:
+            # Extract date from timestamp
+            dt_obj = datetime.fromtimestamp(entry['dt'])
+            date_key = dt_obj.strftime('%Y-%m-%d')
+            day_name = dt_obj.strftime('%a')  # Mon, Tue, etc.
+
+            # Initialize day if not exists
+            if date_key not in daily_forecasts:
+                daily_forecasts[date_key] = {
+                    'date': date_key,
+                    'day_name': day_name,
+                    'temps': [],
+                    'conditions': [],
+                    'dt': entry['dt']
+                }
+
+            # Collect temperature and weather data
+            daily_forecasts[date_key]['temps'].append(entry['main']['temp'])
+            daily_forecasts[date_key]['conditions'].append(entry['weather'][0]['main'])
+
+        # Calculate daily summaries
+        summaries = []
+        for date_key in sorted(daily_forecasts.keys()):
+            day_data = daily_forecasts[date_key]
+            temps = day_data['temps']
+
+            # Find most common weather condition
+            condition_counts = Counter(day_data['conditions'])
+            most_common_condition = condition_counts.most_common(1)[0][0]
+
+            summaries.append({
+                'date': date_key,
+                'day_name': day_data['day_name'],
+                'high': max(temps),
+                'low': min(temps),
+                'condition': most_common_condition,
+                'dt': day_data['dt']
+            })
+
+        return summaries[:5]  # Return only first 5 days
 
     async def weather_command(self, ctx, zip_code: str = None):
         """Get weather information by zip code or use saved location."""
@@ -247,3 +337,98 @@ class WeatherModule(BaseModule):
 
         location = data['name']
         await ctx.send(f"Your location has been saved as {location} ({zip_code}). Use `!weather` without a zip code to get weather for your saved location.")
+
+    async def forecast_command(self, ctx, zip_code: str = None):
+        """Display 5-day weather forecast."""
+        from datetime import datetime
+
+        user_id = str(ctx.author.id)
+
+        # If no zip code provided, try to use saved location
+        if not zip_code:
+            if user_id in self.user_locations:
+                zip_code = self.user_locations[user_id]
+            else:
+                await ctx.send("Please provide a zip code or save your location with `!setlocation <zipcode>`")
+                return
+
+        # Validate zip code format (5 digits)
+        if not zip_code.isdigit() or len(zip_code) != 5:
+            await ctx.send("Please provide a valid 5-digit US zip code")
+            return
+
+        # Fetch forecast data
+        data, error = await self.fetch_forecast(zip_code)
+
+        if error:
+            await ctx.send(f"Error: {error}")
+            return
+
+        # Aggregate into daily forecasts
+        daily_forecasts = self.aggregate_daily_forecast(data)
+
+        # Get location name
+        location = data['city']['name']
+
+        # Weather emoji mapping
+        weather_emoji = {
+            'Clear': '☀️',
+            'Clouds': '☁️',
+            'Rain': '🌧️',
+            'Drizzle': '🌦️',
+            'Thunderstorm': '⛈️',
+            'Snow': '❄️',
+            'Mist': '🌫️',
+            'Fog': '🌫️',
+            'Haze': '🌫️',
+            'Smoke': '💨',
+        }
+
+        # Create forecast embed
+        embed = discord.Embed(
+            title=f"📅 5-Day Forecast for {location}",
+            description="Daily high and low temperatures",
+            color=discord.Color.blue(),
+            timestamp=discord.utils.utcnow()
+        )
+
+        # Add each day's forecast
+        today = datetime.now().date()
+        for i, day in enumerate(daily_forecasts):
+            forecast_date = datetime.strptime(day['date'], '%Y-%m-%d').date()
+
+            # Determine day label
+            if forecast_date == today:
+                day_label = "Today"
+            elif i == 0:
+                day_label = "Today"
+            elif i == 1 or (i == 0 and forecast_date > today):
+                day_label = "Tomorrow"
+            else:
+                day_label = day['day_name']
+
+            # Format date for display
+            formatted_date = forecast_date.strftime('%m/%d')
+
+            # Get emoji for condition
+            emoji = weather_emoji.get(day['condition'], '🌤️')
+
+            # Build field value
+            field_value = (
+                f"High: **{day['high']:.0f}°F** | Low: **{day['low']:.0f}°F**\n"
+                f"{day['condition']}"
+            )
+
+            # Add field with day's forecast
+            embed.add_field(
+                name=f"{emoji} {day_label} ({formatted_date})",
+                value=field_value,
+                inline=False
+            )
+
+        # Footer
+        embed.set_footer(
+            text=f"📍 Zip Code: {zip_code} • Powered by OpenWeatherMap"
+        )
+
+        await ctx.send(embed=embed)

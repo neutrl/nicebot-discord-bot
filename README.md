@@ -31,7 +31,8 @@ See [DOCKER.md](DOCKER.md) for complete Docker documentation.
 - Tracks the number of "Nice!" responses per server and per channel
 - Persists counts to a file so they survive bot restarts
 - `!count` command to display statistics
-- `!weather` command to check weather by zip code
+- `!weather` command to check current weather by zip code
+- `!forecast` command to view 5-day weather forecast
 - `!setlocation` command to save your location for quick weather lookups
 - `!search` command for DuckDuckGo searches
 - `!quote` command to search and display quotes from a database
@@ -45,7 +46,7 @@ The bot uses a modular system where you can enable or disable features individua
 
 | Module Name | Description | Commands |
 |-------------|-------------|----------|
-| `weather` | Weather lookup and location management | `!weather`, `!setlocation` |
+| `weather` | Weather lookup and location management | `!weather`, `!forecast`, `!setlocation` |
 | `count` | Display nice count statistics | `!count` |
 | `search` | DuckDuckGo search integration | `!search` |
 | `quote` | Search and display quotes from database | `!quote` |
@@ -293,6 +294,28 @@ After setting your location, you can use `!weather` without a zip code:
 ```
 
 The bot will automatically use your saved location. User locations are saved and persist across bot restarts.
+
+#### Get 5-Day Forecast
+
+View the 5-day weather forecast:
+
+```
+!forecast 10001
+```
+
+Or use your saved location:
+
+```
+!forecast
+```
+
+The forecast displays:
+- Daily high and low temperatures
+- Weather conditions for each day
+- 5-day outlook with emoji indicators
+- Easy-to-read format showing "Today", "Tomorrow", and upcoming days
+
+**Note:** The forecast uses the same saved location system as `!weather`. Set your location once with `!setlocation` and both commands will use it.
 
 ### Search Command
 
