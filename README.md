@@ -37,6 +37,7 @@ See [DOCKER.md](DOCKER.md) for complete Docker documentation.
 - `!search` command for DuckDuckGo searches
 - `!quote` command to search and display quotes from a database
 - `!friday` command to celebrate Fridays with Rebecca Black (only works on Fridays!)
+- `!stock` command to check real-time stock prices and market data
 - User location persistence across bot restarts
 - Ignores its own messages to prevent infinite loops
 - Simple and lightweight
@@ -52,6 +53,7 @@ The bot uses a modular system where you can enable or disable features individua
 | `search` | DuckDuckGo search integration | `!search` |
 | `quote` | Search and display quotes from database | `!quote` |
 | `friday` | Friday celebration (Rebecca Black video) | `!friday` |
+| `stock` | Real-time stock prices and market data | `!stock` |
 | `nice_trigger` | Responds "Nice!" to messages containing "nice" | (automatic trigger) |
 | `shutup_trigger` | Responds "No, u!" to messages containing "shut up" | (automatic trigger) |
 | `eagles_trigger` | Random Eagles chants for messages containing "eagles" | (automatic trigger) |
@@ -109,6 +111,7 @@ pip install -r requirements.txt
        "search",
        "quote",
        "friday",
+       "stock",
        "nice_trigger",
        "shutup_trigger",
        "eagles_trigger"
@@ -186,6 +189,7 @@ To enable all modules, include all available module names:
     "search",
     "quote",
     "friday",
+    "stock",
     "nice_trigger",
     "shutup_trigger",
     "eagles_trigger"
@@ -200,6 +204,7 @@ Some modules have additional configuration options:
 - `eagles_cooldown`: Time in seconds between Eagles responses per channel (default: 600 = 10 minutes)
 - `eagles_cleanup_days`: Days to keep channel timestamps before cleanup (default: 7 days)
 - `friday_cleanup_days`: Days to keep Friday usage records before cleanup (default: 30 days)
+- `stock_cache_minutes`: Minutes to cache stock price data (default: 5 minutes)
 - `weather_api_key`: Required for the weather module to work
 
 ### Module Dependencies
@@ -423,6 +428,79 @@ Come back in 2 days when the weekend arrives! 🗓️
 ```
 
 **Note:** The bot uses server time to determine if it's Friday. The video link is automatically tracked per channel and resets weekly.
+
+### Stock Command
+
+Get real-time stock prices and market data from Yahoo Finance!
+
+```
+!stock AAPL
+```
+
+**Features:**
+- ✅ **Real-time stock prices** - Powered by Yahoo Finance (no API key required)
+- ✅ **Comprehensive data** - Current price, change, day range, volume, market cap
+- ✅ **Visual indicators** - Color-coded embeds (green for up, red for down, blue for unchanged)
+- ✅ **5-minute caching** - Reduces API calls and provides faster responses
+- ✅ **Supports multiple asset types** - Stocks, crypto, indices, and more
+
+**Examples:**
+
+Check a stock price:
+```
+!stock AAPL
+!stock TSLA
+!stock MSFT
+```
+
+Check cryptocurrency:
+```
+!stock BTC-USD
+!stock ETH-USD
+```
+
+Check market indices:
+```
+!stock ^GSPC    (S&P 500)
+!stock ^DJI     (Dow Jones)
+```
+
+**Display Format:**
+
+The bot shows a beautiful Discord embed with:
+- 💰 Current price (large display)
+- 📊 Change amount and percentage
+- 🔙 Previous close
+- 📏 Day's trading range (high/low)
+- 📦 Trading volume
+- 💎 Market capitalization (formatted in billions/millions)
+
+**Example output for `!stock AAPL`:**
+```
+📈 AAPL
+Apple Inc.
+
+💰 Current Price
+# $182.45
+
+📊 Change                    🔙 Previous Close
++$2.35 (+1.31%)             $180.10
+
+📏 Day Range                 📦 Volume
+$180.00 - $183.50           52,847,234
+
+💎 Market Cap
+$2.89T
+
+Powered by Yahoo Finance • Data may be delayed
+```
+
+**Caching:**
+- Stock data is cached for 5 minutes (configurable)
+- Cached responses show "Cached data" in the footer
+- Prevents excessive API calls and provides faster responses
+
+**Note:** Yahoo Finance data may be delayed by 15-20 minutes for some exchanges. The stock module requires no API key and works immediately after enabling it in your config.
 
 ## Security Note
 
