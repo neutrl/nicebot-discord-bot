@@ -14,18 +14,10 @@ class EaglesTriggerModule(BaseModule):
         super().__init__(bot, config, data_dir)
         self.last_eagles_response = {}  # Dictionary: {channel_id: timestamp}
         self.eagles_file = os.path.join(data_dir, 'eagles_timestamp.json')
+        self.responses_file = os.path.join(data_dir, 'eagles_responses.json')
         self.cooldown = config.get('eagles_cooldown', 600)  # Default 10 minutes
         self.cleanup_days = config.get('eagles_cleanup_days', 7)  # Clean up after 7 days
-        self.eagles_responses = [
-            'Go Birds!',
-            'da birds!',
-            'E.A.G.L.E.S',
-            'E-A-G-L-E-S EAGLES!',
-            'Fly Eagles Fly!',
-            'Bleed green!',
-            'Fuck Dallas!',
-            'Go Birds.',
-        ]
+        self.eagles_responses = self.load_responses()
 
     @property
     def name(self) -> str:
@@ -34,6 +26,47 @@ class EaglesTriggerModule(BaseModule):
     @property
     def description(self) -> str:
         return "Responds to 'eagles' with random Eagles chants (10-min cooldown)"
+
+    def load_responses(self) -> list:
+        """Load Eagles responses from JSON file."""
+        try:
+            if os.path.exists(self.responses_file):
+                with open(self.responses_file, 'r') as f:
+                    data = json.load(f)
+                    responses = [item['text'] for item in data.get('responses', [])]
+                    if responses:
+                        print(f'  Loaded {len(responses)} Eagles responses from {self.responses_file}')
+                        return responses
+        except Exception as e:
+            print(f'  Error loading Eagles responses: {e}')
+
+        # Fallback to default responses if file doesn't exist or has errors
+        print(f'  Using default Eagles responses')
+        return [
+            'Go Birds!',
+            'da birds!',
+            'E.A.G.L.E.S',
+            'E-A-G-L-E-S EAGLES!',
+            'Fly Eagles Fly!',
+            'Bleed green!',
+            'Go Birds.',
+            'Bird Gang!',
+            'Gang Green!',
+            'Let\'s go Birds!',
+            'In Jalen we trust!',
+            'Philly Special!',
+            'It\'s a Philly thing!',
+            '🦅🦅🦅',
+            'Fuck Dallas!',
+            'Dallas sucks!',
+            'Cowgirls!',
+            'America\'s most overrated team!',
+            'Rent free in Dallas!',
+            'How bout them Cowboys? HAHAHAHA',
+            'Dallas ain\'t shit!',
+            'Poverty franchise!',
+            'BOOOO DALLAS!',
+        ]
 
     async def setup(self):
         """Set up the eagles trigger module."""

@@ -26,9 +26,11 @@ See [DOCKER.md](DOCKER.md) for complete Docker documentation.
 - Responds "Nice!" to any message containing the word "nice" (case-insensitive)
 - Responds "No, u!" to any message containing "shut up" (case-insensitive)
 - Responds with randomized Eagles responses to any message containing "eagles" (case-insensitive)
-  - Includes: "Go Birds!", "da birds!", "E.A.G.L.E.S", "Fly Eagles Fly!", and more
+  - Includes: "Go Birds!", "da birds!", "E.A.G.L.E.S", "Fly Eagles Fly!", "Philly Special!", "Gang Green!", and more
+  - Also includes anti-Dallas chants: "Cowgirls!", "Dallas sucks!", "Poverty franchise!", and more
   - 10-minute per-channel cooldown to prevent spam (each channel independent)
 - Responds with randomized Eagles responses to any message containing "fuck dallas" (case-insensitive, no cooldown)
+  - Uses the same expanded list of Eagles chants and anti-Dallas responses
 - Tracks the number of "Nice!" responses per server and per channel
 - Persists counts to a file so they survive bot restarts
 - `!count` command to display statistics
@@ -251,15 +253,19 @@ The bot shows team spirit with randomized responses when "eagles" is mentioned (
 
 Examples:
 - User: "eagles"
-- Bot: "Go Birds!" (or "da birds!", "E.A.G.L.E.S", "Fly Eagles Fly!", "Bleed green!", etc.)
+- Bot: "Go Birds!" (or "da birds!", "E.A.G.L.E.S", "Fly Eagles Fly!", "Bleed green!", "Philly Special!", etc.)
 
 - User: "Let's go Eagles!"
-- Bot: "E-A-G-L-E-S EAGLES!"
+- Bot: "Bird Gang!"
 
 - User: "Did you see the Eagles game?"
-- Bot: "da birds!"
+- Bot: "Cowgirls!" (or any other random response)
 
-**Note:** The bot will only respond once every 10 minutes **per channel** to prevent spam. Each channel has its own independent cooldown, so #general and #sports can both enjoy Eagles responses separately. Each response is randomly selected from a variety of Eagles chants and phrases.
+**Available responses** (23 total):
+- **Eagles chants**: Go Birds!, da birds!, E.A.G.L.E.S, E-A-G-L-E-S EAGLES!, Fly Eagles Fly!, Bleed green!, Bird Gang!, Gang Green!, Let's go Birds!, In Jalen we trust!, Philly Special!, It's a Philly thing!, 🦅🦅🦅
+- **Anti-Dallas chants**: Fuck Dallas!, Dallas sucks!, Cowgirls!, America's most overrated team!, Rent free in Dallas!, How bout them Cowboys? HAHAHAHA, Dallas ain't shit!, Poverty franchise!, BOOOO DALLAS!
+
+**Note:** The bot will only respond once every 10 minutes **per channel** to prevent spam. Each channel has its own independent cooldown, so #general and #sports can both enjoy Eagles responses separately. Each response is randomly selected from the full list above.
 
 ### Responding to "fuck dallas"
 
@@ -267,15 +273,44 @@ The bot shows team spirit with randomized responses when "fuck dallas" is mentio
 
 Examples:
 - User: "fuck dallas"
-- Bot: "Go Birds!" (or "da birds!", "E.A.G.L.E.S", "Fly Eagles Fly!", "Bleed green!", "Fuck Dallas!", etc.)
+- Bot: "Cowgirls!" (or "Poverty franchise!", "Gang Green!", "Dallas ain't shit!", etc.)
 
 - User: "man fuck dallas!"
-- Bot: "E-A-G-L-E-S EAGLES!"
+- Bot: "How bout them Cowboys? HAHAHAHA"
 
 - User: "FUCK DALLAS"
-- Bot: "Bleed green!"
+- Bot: "America's most overrated team!"
 
-**Note:** This trigger has no cooldown and will respond every time "fuck dallas" is mentioned in any message. Each response is randomly selected from the same variety of Eagles chants and phrases used by the eagles trigger.
+**Note:** This trigger has no cooldown and will respond every time "fuck dallas" is mentioned in any message. Uses the same 23 responses as the eagles trigger (both Eagles chants and anti-Dallas chants).
+
+#### Customizing Eagles Responses
+
+Both the eagles and dallas triggers load their responses from `data/eagles_responses.json`, making it easy to customize without editing code!
+
+**To add or edit responses:**
+
+1. Open `data/eagles_responses.json` in any text editor
+2. Add, remove, or modify responses in the JSON array
+3. Each response has a `text` (the message) and `category` (either "eagles" or "anti-dallas")
+4. Restart the bot to load the new responses
+
+**Example format:**
+```json
+{
+  "responses": [
+    {
+      "text": "Your custom Eagles chant here!",
+      "category": "eagles"
+    },
+    {
+      "text": "Your custom Dallas diss!",
+      "category": "anti-dallas"
+    }
+  ]
+}
+```
+
+**Note:** If the JSON file is missing or has errors, the bot will automatically fall back to the default 23 responses.
 
 ### Checking Statistics
 
