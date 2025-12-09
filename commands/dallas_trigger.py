@@ -1,10 +1,24 @@
 """Dallas trigger module - responds to messages containing 'fuck dallas'."""
 
+import random
 from . import BaseModule
 
 
 class DallasTriggerModule(BaseModule):
-    """Module that responds 'go birds.' to messages containing 'fuck dallas'."""
+    """Module that responds with random Eagles chants to messages containing 'fuck dallas'."""
+
+    def __init__(self, bot, config: dict, data_dir: str = "data"):
+        super().__init__(bot, config, data_dir)
+        self.eagles_responses = [
+            'Go Birds!',
+            'da birds!',
+            'E.A.G.L.E.S',
+            'E-A-G-L-E-S EAGLES!',
+            'Fly Eagles Fly!',
+            'Bleed green!',
+            'Fuck Dallas!',
+            'Go Birds.',
+        ]
 
     @property
     def name(self) -> str:
@@ -12,7 +26,7 @@ class DallasTriggerModule(BaseModule):
 
     @property
     def description(self) -> str:
-        return "Responds 'go birds.' to messages containing 'fuck dallas'"
+        return "Responds with random Eagles chants to messages containing 'fuck dallas'"
 
     async def setup(self):
         """Set up the dallas trigger module."""
@@ -33,4 +47,5 @@ class DallasTriggerModule(BaseModule):
 
         # Check if the message contains "fuck dallas"
         if 'fuck dallas' in message_lower:
-            await message.channel.send('go birds.')
+            response = random.choice(self.eagles_responses)
+            await message.channel.send(response)

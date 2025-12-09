@@ -28,7 +28,7 @@ See [DOCKER.md](DOCKER.md) for complete Docker documentation.
 - Responds with randomized Eagles responses to any message containing "eagles" (case-insensitive)
   - Includes: "Go Birds!", "da birds!", "E.A.G.L.E.S", "Fly Eagles Fly!", and more
   - 10-minute per-channel cooldown to prevent spam (each channel independent)
-- Responds "go birds." to any message containing "fuck dallas" (case-insensitive, no cooldown)
+- Responds with randomized Eagles responses to any message containing "fuck dallas" (case-insensitive, no cooldown)
 - Tracks the number of "Nice!" responses per server and per channel
 - Persists counts to a file so they survive bot restarts
 - `!count` command to display statistics
@@ -58,7 +58,7 @@ The bot uses a modular system where you can enable or disable features individua
 | `nice_trigger` | Responds "Nice!" to messages containing "nice" | (automatic trigger) |
 | `shutup_trigger` | Responds "No, u!" to messages containing "shut up" | (automatic trigger) |
 | `eagles_trigger` | Random Eagles chants for messages containing "eagles" | (automatic trigger) |
-| `dallas_trigger` | Responds "go birds." to messages containing "fuck dallas" | (automatic trigger) |
+| `dallas_trigger` | Random Eagles chants for messages containing "fuck dallas" | (automatic trigger) |
 
 ## Setup Instructions
 
@@ -263,19 +263,19 @@ Examples:
 
 ### Responding to "fuck dallas"
 
-The bot shows team spirit with an instant response when "fuck dallas" is mentioned (no cooldown):
+The bot shows team spirit with randomized responses when "fuck dallas" is mentioned (no cooldown):
 
 Examples:
 - User: "fuck dallas"
-- Bot: "go birds."
+- Bot: "Go Birds!" (or "da birds!", "E.A.G.L.E.S", "Fly Eagles Fly!", "Bleed green!", "Fuck Dallas!", etc.)
 
 - User: "man fuck dallas!"
-- Bot: "go birds."
+- Bot: "E-A-G-L-E-S EAGLES!"
 
 - User: "FUCK DALLAS"
-- Bot: "go birds."
+- Bot: "Bleed green!"
 
-**Note:** This trigger has no cooldown and will respond every time "fuck dallas" is mentioned in any message.
+**Note:** This trigger has no cooldown and will respond every time "fuck dallas" is mentioned in any message. Each response is randomly selected from the same variety of Eagles chants and phrases used by the eagles trigger.
 
 ### Checking Statistics
 
