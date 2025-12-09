@@ -1,6 +1,6 @@
 # Discord "Nice" Bot
 
-A simple Discord bot that responds with "Nice!" whenever a user says "nice" in any message, responds with "No, u!" when someone says "shut up", and shows team spirit with randomized Eagles responses when someone mentions "eagles".
+A simple Discord bot that responds with "Nice!" whenever a user says "nice" in any message, responds with "No, u!" when someone says "shut up", shows team spirit with randomized Eagles responses when someone mentions "eagles", and responds "go birds." when someone says "fuck dallas".
 
 ## 🐳 Quick Start with Docker
 
@@ -28,6 +28,7 @@ See [DOCKER.md](DOCKER.md) for complete Docker documentation.
 - Responds with randomized Eagles responses to any message containing "eagles" (case-insensitive)
   - Includes: "Go Birds!", "da birds!", "E.A.G.L.E.S", "Fly Eagles Fly!", and more
   - 10-minute per-channel cooldown to prevent spam (each channel independent)
+- Responds "go birds." to any message containing "fuck dallas" (case-insensitive, no cooldown)
 - Tracks the number of "Nice!" responses per server and per channel
 - Persists counts to a file so they survive bot restarts
 - `!count` command to display statistics
@@ -57,6 +58,7 @@ The bot uses a modular system where you can enable or disable features individua
 | `nice_trigger` | Responds "Nice!" to messages containing "nice" | (automatic trigger) |
 | `shutup_trigger` | Responds "No, u!" to messages containing "shut up" | (automatic trigger) |
 | `eagles_trigger` | Random Eagles chants for messages containing "eagles" | (automatic trigger) |
+| `dallas_trigger` | Responds "go birds." to messages containing "fuck dallas" | (automatic trigger) |
 
 ## Setup Instructions
 
@@ -114,7 +116,8 @@ pip install -r requirements.txt
        "stock",
        "nice_trigger",
        "shutup_trigger",
-       "eagles_trigger"
+       "eagles_trigger",
+       "dallas_trigger"
      ],
      "eagles_cooldown": 600
    }
@@ -192,7 +195,8 @@ To enable all modules, include all available module names:
     "stock",
     "nice_trigger",
     "shutup_trigger",
-    "eagles_trigger"
+    "eagles_trigger",
+    "dallas_trigger"
   ]
 }
 ```
@@ -256,6 +260,22 @@ Examples:
 - Bot: "da birds!"
 
 **Note:** The bot will only respond once every 10 minutes **per channel** to prevent spam. Each channel has its own independent cooldown, so #general and #sports can both enjoy Eagles responses separately. Each response is randomly selected from a variety of Eagles chants and phrases.
+
+### Responding to "fuck dallas"
+
+The bot shows team spirit with an instant response when "fuck dallas" is mentioned (no cooldown):
+
+Examples:
+- User: "fuck dallas"
+- Bot: "go birds."
+
+- User: "man fuck dallas!"
+- Bot: "go birds."
+
+- User: "FUCK DALLAS"
+- Bot: "go birds."
+
+**Note:** This trigger has no cooldown and will respond every time "fuck dallas" is mentioned in any message.
 
 ### Checking Statistics
 

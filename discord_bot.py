@@ -45,6 +45,7 @@ def load_module(module_name: str, config: dict):
             'nice_trigger': ('commands.nice_trigger', 'NiceTriggerModule'),
             'shutup_trigger': ('commands.shutup_trigger', 'ShutUpTriggerModule'),
             'eagles_trigger': ('commands.eagles_trigger', 'EaglesTriggerModule'),
+            'dallas_trigger': ('commands.dallas_trigger', 'DallasTriggerModule'),
         }
 
         if module_name not in module_map:
