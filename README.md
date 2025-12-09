@@ -285,11 +285,11 @@ Examples:
 
 #### Customizing Eagles Responses
 
-Both the eagles and dallas triggers load their responses from `data/eagles_responses.json`, making it easy to customize without editing code!
+Both the eagles and dallas triggers load their responses from `eagles_responses.json` in the project root, making it easy to customize without editing code!
 
 **To add or edit responses:**
 
-1. Open `data/eagles_responses.json` in any text editor
+1. Open `eagles_responses.json` in any text editor (it's in the main project folder)
 2. Add, remove, or modify responses in the JSON array
 3. Each response has a `text` (the message) and `category` (either "eagles" or "anti-dallas")
 4. Restart the bot to load the new responses
@@ -310,7 +310,9 @@ Both the eagles and dallas triggers load their responses from `data/eagles_respo
 }
 ```
 
-**Note:** If the JSON file is missing or has errors, the bot will automatically fall back to the default 23 responses.
+**Note:**
+- This file is tracked by git, so your custom responses will be committed with the project
+- If the JSON file is missing or has errors, the bot will automatically fall back to the default 23 responses
 
 ### Checking Statistics
 

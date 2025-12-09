@@ -14,7 +14,7 @@ class EaglesTriggerModule(BaseModule):
         super().__init__(bot, config, data_dir)
         self.last_eagles_response = {}  # Dictionary: {channel_id: timestamp}
         self.eagles_file = os.path.join(data_dir, 'eagles_timestamp.json')
-        self.responses_file = os.path.join(data_dir, 'eagles_responses.json')
+        self.responses_file = 'eagles_responses.json'  # In root directory
         self.cooldown = config.get('eagles_cooldown', 600)  # Default 10 minutes
         self.cleanup_days = config.get('eagles_cleanup_days', 7)  # Clean up after 7 days
         self.eagles_responses = self.load_responses()
@@ -28,7 +28,7 @@ class EaglesTriggerModule(BaseModule):
         return "Responds to 'eagles' with random Eagles chants (10-min cooldown)"
 
     def load_responses(self) -> list:
-        """Load Eagles responses from JSON file."""
+        """Load Eagles responses from JSON file in root directory."""
         try:
             if os.path.exists(self.responses_file):
                 with open(self.responses_file, 'r') as f:

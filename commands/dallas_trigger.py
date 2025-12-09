@@ -11,7 +11,7 @@ class DallasTriggerModule(BaseModule):
 
     def __init__(self, bot, config: dict, data_dir: str = "data"):
         super().__init__(bot, config, data_dir)
-        self.responses_file = os.path.join(data_dir, 'eagles_responses.json')
+        self.responses_file = 'eagles_responses.json'  # In root directory
         self.eagles_responses = self.load_responses()
 
     @property
@@ -23,7 +23,7 @@ class DallasTriggerModule(BaseModule):
         return "Responds with random Eagles chants to messages containing 'fuck dallas'"
 
     def load_responses(self) -> list:
-        """Load Eagles responses from JSON file."""
+        """Load Eagles responses from JSON file in root directory."""
         try:
             if os.path.exists(self.responses_file):
                 with open(self.responses_file, 'r') as f:
