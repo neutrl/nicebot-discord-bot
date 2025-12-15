@@ -212,8 +212,6 @@ class WeatherModule(BaseModule):
         location = data['name']
         temp = data['main']['temp']
         feels_like = data['main']['feels_like']
-        temp_min = data['main']['temp_min']
-        temp_max = data['main']['temp_max']
         humidity = data['main']['humidity']
         pressure = data['main']['pressure']
         description = data['weather'][0]['description'].capitalize()
@@ -267,13 +265,6 @@ class WeatherModule(BaseModule):
             name="🌡️ Current Temperature",
             value=f"# {temp:.0f}°F\nFeels like **{feels_like:.0f}°F**",
             inline=False
-        )
-
-        # High/Low temps
-        embed.add_field(
-            name="📊 High / Low",
-            value=f"↑ **{temp_max:.0f}°F** / ↓ **{temp_min:.0f}°F**",
-            inline=True
         )
 
         # Humidity
