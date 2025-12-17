@@ -46,6 +46,7 @@ class TriggersModule(BaseModule):
             "**!stock** `<ticker>` - Stock prices (e.g., AAPL, BTC-USD)\n"
             "**!quote** `[search]` - Random quote or search quotes\n"
             "**!friday** - Friday celebration (Fridays only!)\n"
+            "**!bartender** - Link to Bartender song 🍹\n"
             "**!count** - Nice count statistics\n"
             "**!search** `<query>` - DuckDuckGo search\n"
             "**!triggers** - Show this help message"

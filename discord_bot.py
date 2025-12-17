@@ -43,6 +43,7 @@ def load_module(module_name: str, config: dict):
             'friday': ('commands.friday_module', 'FridayModule'),
             'stock': ('commands.stock_module', 'StockModule'),
             'triggers': ('commands.triggers_module', 'TriggersModule'),
+            'bartender': ('commands.bartender_module', 'BartenderModule'),
             'nice_trigger': ('commands.nice_trigger', 'NiceTriggerModule'),
             'shutup_trigger': ('commands.shutup_trigger', 'ShutUpTriggerModule'),
             'eagles_trigger': ('commands.eagles_trigger', 'EaglesTriggerModule'),

@@ -41,6 +41,7 @@ See [DOCKER.md](DOCKER.md) for complete Docker documentation.
 - `!quote` command to search and display quotes from a database
 - `!friday` command to celebrate Fridays with Rebecca Black (only works on Fridays!)
 - `!stock` command to check real-time stock prices and market data
+- `!bartender` command to link to the Bartender song on YouTube
 - `!triggers` command to display help and information about bot features
 - User location persistence across bot restarts
 - Ignores its own messages to prevent infinite loops
@@ -58,6 +59,7 @@ The bot uses a modular system where you can enable or disable features individua
 | `quote` | Search and display quotes from database | `!quote` |
 | `friday` | Friday celebration (Rebecca Black video) | `!friday` |
 | `stock` | Real-time stock prices and market data | `!stock` |
+| `bartender` | Links to Bartender song on YouTube | `!bartender` |
 | `triggers` | Display bot help and information | `!triggers` |
 | `nice_trigger` | Responds "Nice!" to messages containing "nice" | (automatic trigger) |
 | `shutup_trigger` | Responds "No, u!" to messages containing "shut up" | (automatic trigger) |
@@ -118,6 +120,7 @@ pip install -r requirements.txt
        "quote",
        "friday",
        "stock",
+       "bartender",
        "triggers",
        "nice_trigger",
        "shutup_trigger",
@@ -198,6 +201,7 @@ To enable all modules, include all available module names:
     "quote",
     "friday",
     "stock",
+    "bartender",
     "triggers",
     "nice_trigger",
     "shutup_trigger",
@@ -562,6 +566,28 @@ Powered by Yahoo Finance • Data may be delayed
 - Prevents excessive API calls and provides faster responses
 
 **Note:** Yahoo Finance data may be delayed by 15-20 minutes for some exchanges. The stock module requires no API key and works immediately after enabling it in your config.
+
+### Bartender Command
+
+Link to the Bartender song on YouTube!
+
+```
+!bartender
+```
+
+**Features:**
+- 🍹 **Quick link** - Instantly shares the Bartender song
+- 🎵 **YouTube integration** - Direct link to the song on YouTube
+- 📱 **Embed format** - Beautiful Discord embed with clickable link
+
+**Example output:**
+
+The bot displays an embed titled "🍹 Bartender" with:
+- Song title: "Rehab - Bartender"
+- Direct YouTube link: https://www.youtube.com/watch?v=pdEvL6jxUYA
+- Clickable button to open the video
+
+Perfect for sharing your favorite song with the server! 🎶
 
 ## Security Note
 
