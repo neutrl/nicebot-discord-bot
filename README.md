@@ -41,6 +41,7 @@ See [DOCKER.md](DOCKER.md) for complete Docker documentation.
 - `!quote` command to search and display quotes from a database
 - `!friday` command to celebrate Fridays with Rebecca Black (only works on Fridays!)
 - `!stock` command to check real-time stock prices and market data
+- `!triggers` command to display help and information about bot features
 - User location persistence across bot restarts
 - Ignores its own messages to prevent infinite loops
 - Simple and lightweight
@@ -57,6 +58,7 @@ The bot uses a modular system where you can enable or disable features individua
 | `quote` | Search and display quotes from database | `!quote` |
 | `friday` | Friday celebration (Rebecca Black video) | `!friday` |
 | `stock` | Real-time stock prices and market data | `!stock` |
+| `triggers` | Display bot help and information | `!triggers` |
 | `nice_trigger` | Responds "Nice!" to messages containing "nice" | (automatic trigger) |
 | `shutup_trigger` | Responds "No, u!" to messages containing "shut up" | (automatic trigger) |
 | `eagles_trigger` | Random Eagles chants for messages containing "eagles" | (automatic trigger) |
@@ -116,6 +118,7 @@ pip install -r requirements.txt
        "quote",
        "friday",
        "stock",
+       "triggers",
        "nice_trigger",
        "shutup_trigger",
        "eagles_trigger",
@@ -195,6 +198,7 @@ To enable all modules, include all available module names:
     "quote",
     "friday",
     "stock",
+    "triggers",
     "nice_trigger",
     "shutup_trigger",
     "eagles_trigger",
