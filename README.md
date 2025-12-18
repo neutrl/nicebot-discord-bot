@@ -51,7 +51,9 @@ See [DOCKER.md](DOCKER.md) for complete Docker documentation.
 - **!setlocation** `<zip>` - Save your zip code for quick lookups
 - **!stock** `<ticker>` - Real-time stock prices, crypto, and indices (AAPL, BTC-USD, etc.)
 - **!quote** `[search]` - Random quote or search 1,008 quotes by keyword/ID
-- **!chat** `<prompt>` - Ask ChatGPT anything - get intelligent AI responses!
+- **!chat** `<prompt>` - Chat with AI (remembers conversation context per user)
+  - **!chat reset** - Clear your conversation history
+  - **!chat history** - View your conversation stats
 - **!search** `<query>` - DuckDuckGo web search with top 5 results
 - **!friday** - Friday celebration (Rebecca Black) - Only works on Fridays, once per channel!
 - **!bartender** - Quick link to Bartender song on YouTube
@@ -612,20 +614,38 @@ Powered by Yahoo Finance • Data may be delayed
 
 ### Chat Command (ChatGPT)
 
-Ask OpenAI's ChatGPT anything and get intelligent AI responses!
+Have natural conversations with OpenAI's ChatGPT! The bot remembers your conversation context, allowing for multi-turn discussions.
 
 ```
 !chat What is the capital of France?
+!chat Tell me more about its history
+!chat What are some must-see landmarks there?
 ```
 
 **Features:**
 - 🤖 **Powered by GPT-4o-mini** - Fast, intelligent, and cost-effective AI model
+- 💭 **Conversation Memory** - Bot remembers your chat history for contextual responses
 - 💬 **Unlimited topics** - Ask about anything: facts, coding, creative writing, explanations, and more
 - 🎯 **Smart responses** - Get detailed, context-aware answers
 - ⚡ **Fast processing** - Responses typically arrive in seconds
+- 🔒 **Private conversations** - Each user has their own independent chat history
 - 💰 **Cost-effective** - GPT-4o-mini is optimized for performance and affordability
 
+**Commands:**
+```
+!chat <prompt>          - Chat with AI (remembers context)
+!chat history           - View your conversation stats
+!chat reset             - Clear your conversation history
+```
+
 **Examples:**
+
+Multi-turn conversation:
+```
+!chat What is Python?
+!chat What are some popular frameworks for it?
+!chat Can you show me an example of a Flask app?
+```
 
 Ask factual questions:
 ```
@@ -654,9 +674,28 @@ Creative writing:
 3. Install the package: `pip install openai`
 4. Enable the `chatgpt` module in your config
 
+**Configuration Options:**
+```json
+{
+  "openai_api_key": "your-api-key-here",
+  "chatgpt_max_history": 10,
+  "chatgpt_system_message": "You are a helpful assistant."
+}
+```
+- `chatgpt_max_history` - Maximum message pairs to remember per user (default: 10)
+- `chatgpt_system_message` - System prompt that defines the AI's behavior
+
+**Conversation Management:**
+- The bot stores up to 10 message exchanges per user by default
+- When the limit is reached, older messages are automatically removed
+- Use `!chat reset` to clear your history and start fresh
+- Use `!chat history` to see how many messages you've exchanged
+- Conversation history is saved to disk and persists across bot restarts
+
 **Pricing:**
 - GPT-4o-mini is very affordable: ~$0.15 per 1M input tokens, ~$0.60 per 1M output tokens
 - Most chat responses cost less than $0.01
+- Longer conversation histories use more tokens per request
 - Check your usage at [OpenAI Usage Dashboard](https://platform.openai.com/usage)
 
 **Note:** Responses are truncated if they exceed Discord's 2000 character limit. Make sure you have API credits in your OpenAI account.

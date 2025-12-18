@@ -2,6 +2,8 @@
   "bot_token": "your-discord-bot-token-here",
   "weather_api_key": "your-openweathermap-api-key-here",
   "openai_api_key": "your-openai-api-key-here",
+  "chatgpt_max_history": 10,
+  "chatgpt_system_message": "You are a helpful assistant.",
   "enabled_modules": [
     "weather",
     "count",

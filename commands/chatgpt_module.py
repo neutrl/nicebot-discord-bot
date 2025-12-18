@@ -3,6 +3,10 @@
 import discord
 from discord.ext import commands
 import asyncio
+import json
+import os
+from pathlib import Path
+from datetime import datetime
 from . import BaseModule
 
 try:
@@ -20,6 +24,15 @@ class ChatGPTModule(BaseModule):
         super().__init__(bot, config, data_dir)
         self.api_key = config.get('openai_api_key')
         self.client = None
+        self.max_history = config.get('chatgpt_max_history', 10)  # Max message pairs per user
+        self.system_message = config.get('chatgpt_system_message', "You are a helpful assistant.")
+
+        # Path to store conversation history
+        self.history_file = Path(data_dir) / "chatgpt_history.json"
+        self.conversation_history = {}
+
+        # Load existing conversation history
+        self._load_history()
 
         if not OPENAI_AVAILABLE:
             print("  Warning: openai package not installed")
@@ -36,6 +49,7 @@ class ChatGPTModule(BaseModule):
                 # Initialize the OpenAI client
                 self.client = OpenAI(api_key=self.api_key)
                 print(f"  Successfully configured OpenAI API client")
+                print(f"  Max conversation history: {self.max_history} message pairs per user")
             except Exception as e:
                 print(f"  Error configuring OpenAI API: {e}")
                 print(f"  Error type: {type(e).__name__}")
@@ -47,6 +61,68 @@ class ChatGPTModule(BaseModule):
     @property
     def description(self) -> str:
         return "OpenAI ChatGPT chat integration (!chat)"
+
+    def _load_history(self):
+        """Load conversation history from file."""
+        if self.history_file.exists():
+            try:
+                with open(self.history_file, 'r') as f:
+                    self.conversation_history = json.load(f)
+                print(f"  Loaded conversation history for {len(self.conversation_history)} users")
+            except Exception as e:
+                print(f"  Error loading conversation history: {e}")
+                self.conversation_history = {}
+        else:
+            self.conversation_history = {}
+
+    def _save_history(self):
+        """Save conversation history to file."""
+        try:
+            # Ensure data directory exists
+            self.history_file.parent.mkdir(parents=True, exist_ok=True)
+
+            with open(self.history_file, 'w') as f:
+                json.dump(self.conversation_history, f, indent=2)
+        except Exception as e:
+            print(f"  Error saving conversation history: {e}")
+
+    def _get_user_history(self, user_id: str) -> list:
+        """Get conversation history for a specific user."""
+        if user_id not in self.conversation_history:
+            self.conversation_history[user_id] = {
+                "messages": [{"role": "system", "content": self.system_message}],
+                "last_interaction": datetime.now().isoformat()
+            }
+        return self.conversation_history[user_id]["messages"]
+
+    def _add_message(self, user_id: str, role: str, content: str):
+        """Add a message to user's conversation history."""
+        if user_id not in self.conversation_history:
+            self.conversation_history[user_id] = {
+                "messages": [{"role": "system", "content": self.system_message}],
+                "last_interaction": datetime.now().isoformat()
+            }
+
+        self.conversation_history[user_id]["messages"].append({
+            "role": role,
+            "content": content
+        })
+        self.conversation_history[user_id]["last_interaction"] = datetime.now().isoformat()
+
+        # Trim history if it exceeds max_history
+        # Keep system message + last max_history message pairs (user + assistant)
+        messages = self.conversation_history[user_id]["messages"]
+        if len(messages) > (self.max_history * 2 + 1):  # +1 for system message
+            # Keep system message and last max_history pairs
+            self.conversation_history[user_id]["messages"] = [messages[0]] + messages[-(self.max_history * 2):]
+
+        self._save_history()
+
+    def _clear_user_history(self, user_id: str):
+        """Clear conversation history for a specific user."""
+        if user_id in self.conversation_history:
+            del self.conversation_history[user_id]
+            self._save_history()
 
     async def setup(self):
         """Set up the chatgpt module."""
@@ -63,12 +139,44 @@ class ChatGPTModule(BaseModule):
 
     async def teardown(self):
         """Clean up the chatgpt module."""
+        self._save_history()
         self.bot.remove_command('chat')
 
     async def chat_command(self, ctx, *, prompt: str = None):
         """Ask ChatGPT a question and return the response."""
         if not prompt:
-            await ctx.send("Please provide a prompt. Example: `!chat What is the capital of France?`")
+            await ctx.send("Please provide a prompt. Example: `!chat What is the capital of France?`\n\n"
+                          "**Special commands:**\n"
+                          "`!chat reset` - Clear your conversation history\n"
+                          "`!chat history` - Show your conversation stats")
+            return
+
+        user_id = str(ctx.author.id)
+
+        # Handle special commands
+        if prompt.lower() == "reset":
+            self._clear_user_history(user_id)
+            await ctx.send("✅ Your conversation history has been cleared!")
+            return
+
+        if prompt.lower() == "history":
+            if user_id in self.conversation_history:
+                messages = self.conversation_history[user_id]["messages"]
+                # Subtract 1 for system message, divide by 2 for pairs
+                message_pairs = (len(messages) - 1) // 2
+                last_interaction = self.conversation_history[user_id]["last_interaction"]
+
+                embed = discord.Embed(
+                    title="💬 Your Conversation History",
+                    color=discord.Color.blue()
+                )
+                embed.add_field(name="Message Exchanges", value=f"{message_pairs}/{self.max_history}", inline=True)
+                embed.add_field(name="Total Messages", value=f"{len(messages) - 1}", inline=True)
+                embed.add_field(name="Last Interaction", value=f"<t:{int(datetime.fromisoformat(last_interaction).timestamp())}:R>", inline=False)
+
+                await ctx.send(embed=embed)
+            else:
+                await ctx.send("You don't have any conversation history yet. Start chatting with `!chat <your message>`")
             return
 
         # Check if API is configured
@@ -85,19 +193,22 @@ class ChatGPTModule(BaseModule):
             return
 
         # Send a "thinking" message
-        thinking_msg = await ctx.send(f"🤖 Asking ChatGPT: **{prompt[:100]}{'...' if len(prompt) > 100 else ''}**")
+        thinking_msg = await ctx.send(f"🤖 Thinking...")
 
         try:
+            # Add user message to history
+            self._add_message(user_id, "user", prompt)
+
+            # Get user's conversation history
+            messages = self._get_user_history(user_id)
+
             # Call OpenAI API in a thread to avoid blocking
             loop = asyncio.get_event_loop()
             response = await loop.run_in_executor(
                 None,
                 lambda: self.client.chat.completions.create(
                     model="gpt-4o-mini",
-                    messages=[
-                        {"role": "system", "content": "You are a helpful assistant."},
-                        {"role": "user", "content": prompt}
-                    ],
+                    messages=messages,
                     max_tokens=1000,
                     temperature=0.7
                 )
@@ -110,6 +221,9 @@ class ChatGPTModule(BaseModule):
             if not response_text:
                 await thinking_msg.edit(content="❌ Received empty response from ChatGPT.")
                 return
+
+            # Add assistant response to history
+            self._add_message(user_id, "assistant", response_text)
 
             # Truncate response if too long for Discord (2000 char limit)
             if len(response_text) > 1900:
