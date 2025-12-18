@@ -1,6 +1,16 @@
-# Discord "Nice" Bot
+# NiceBot - A Feature-Rich Discord Bot
 
-A simple Discord bot that responds with "Nice!" whenever a user says "nice" in any message, responds with "No, u!" when someone says "shut up", shows team spirit with randomized Eagles responses when someone mentions "eagles", and responds "go birds." when someone says "fuck dallas".
+A modular Discord bot with fun triggers, utility commands, and Philadelphia Eagles team spirit! 🦅
+
+**Key Features:**
+- 🎉 **Interactive Triggers** - Responds to "nice", "shut up", "eagles", and more with randomized messages
+- 🌤️ **Weather Integration** - Real-time weather and forecasts with location saving
+- 📈 **Stock Ticker** - Live stock prices from Yahoo Finance
+- 🔍 **Web Search** - DuckDuckGo search integration
+- 💬 **Quote Database** - 1,000+ searchable quotes
+- 🎵 **Music Links** - Quick access to favorite songs
+- 📊 **Statistics Tracking** - Persistent counters and analytics
+- ⚙️ **Fully Modular** - Enable/disable any feature via config
 
 ## 🐳 Quick Start with Docker
 
@@ -22,30 +32,37 @@ See [DOCKER.md](DOCKER.md) for complete Docker documentation.
 
 ## Features
 
-- **Modular Design**: Enable/disable features via config.json
-- Responds "Nice!" to any message containing the word "nice" (case-insensitive)
-- Responds "No, u!" to any message containing "shut up" (case-insensitive)
-- Responds with randomized Eagles responses to any message containing "eagles" (case-insensitive)
-  - Includes: "Go Birds!", "da birds!", "E.A.G.L.E.S", "Fly Eagles Fly!", "Philly Special!", "Gang Green!", and more
-  - Also includes anti-Dallas chants: "Cowgirls!", "Dallas sucks!", "Poverty franchise!", and more
-  - 10-minute per-channel cooldown to prevent spam (each channel independent)
-- Responds with randomized Eagles responses to any message containing "fuck dallas" (case-insensitive, no cooldown)
-  - Uses the same expanded list of Eagles chants and anti-Dallas responses
-- Tracks the number of "Nice!" responses per server and per channel
-- Persists counts to a file so they survive bot restarts
-- `!count` command to display statistics
-- `!weather` command to check current weather by zip code
-- `!forecast` command to view 5-day weather forecast
-- `!setlocation` command to save your location for quick weather lookups
-- `!search` command for DuckDuckGo searches
-- `!quote` command to search and display quotes from a database
-- `!friday` command to celebrate Fridays with Rebecca Black (only works on Fridays!)
-- `!stock` command to check real-time stock prices and market data
-- `!bartender` command to link to the Bartender song on YouTube
-- `!triggers` command to display help and information about bot features
-- User location persistence across bot restarts
-- Ignores its own messages to prevent infinite loops
-- Simple and lightweight
+### 🤖 Automatic Triggers
+- **Nice Trigger** - Responds with randomized "nice" variations to messages containing "nice"
+  - 10 different responses including: "Nice!", "Noice!", "Very nice!", "N🧊", and more
+  - Tracks counts per channel and server with persistent storage
+- **Shut Up Trigger** - Playfully responds "No, u!" to messages containing "shut up"
+- **Eagles Trigger** - Random Eagles chants for messages containing "eagles"
+  - 23+ responses including team chants and anti-Dallas jokes
+  - 10-minute per-channel cooldown to prevent spam
+  - Customizable via `eagles_responses.json`
+- **Dallas Trigger** - Random Eagles chants for "fuck dallas" (no cooldown)
+  - Uses the same response pool as Eagles trigger
+
+### 📋 Commands
+- **!weather** `[zip]` - Current weather conditions for any US zip code
+- **!forecast** `[zip]` - 5-day weather forecast with daily highs/lows
+- **!setlocation** `<zip>` - Save your zip code for quick lookups
+- **!stock** `<ticker>` - Real-time stock prices, crypto, and indices (AAPL, BTC-USD, etc.)
+- **!quote** `[search]` - Random quote or search 1,008 quotes by keyword/ID
+- **!search** `<query>` - DuckDuckGo web search with top 5 results
+- **!friday** - Friday celebration (Rebecca Black) - Only works on Fridays, once per channel!
+- **!bartender** - Quick link to Bartender song on YouTube
+- **!count** - Display "nice" count statistics with channel breakdown
+- **!triggers** - Show help message with all commands and triggers
+
+### ⚙️ Technical Features
+- **Modular Design** - Enable/disable any feature via `config.json`
+- **Persistent Storage** - Counts, locations, and timestamps survive restarts
+- **Docker Support** - Easy deployment with Docker Compose
+- **Smart Caching** - Stock prices cached for 5 minutes to reduce API calls
+- **Cooldown Management** - Per-channel cooldowns with automatic cleanup
+- **Error Handling** - Graceful fallbacks and user-friendly error messages
 
 ## Available Modules
 
@@ -61,7 +78,7 @@ The bot uses a modular system where you can enable or disable features individua
 | `stock` | Real-time stock prices and market data | `!stock` |
 | `bartender` | Links to Bartender song on YouTube | `!bartender` |
 | `triggers` | Display bot help and information | `!triggers` |
-| `nice_trigger` | Responds "Nice!" to messages containing "nice" | (automatic trigger) |
+| `nice_trigger` | Responds with randomized "nice" variations (10 responses) | (automatic trigger) |
 | `shutup_trigger` | Responds "No, u!" to messages containing "shut up" | (automatic trigger) |
 | `eagles_trigger` | Random Eagles chants for messages containing "eagles" | (automatic trigger) |
 | `dallas_trigger` | Random Eagles chants for messages containing "fuck dallas" | (automatic trigger) |
@@ -231,18 +248,29 @@ Once the bot is running and in your server:
 
 ### Responding to "nice"
 
-1. Type any message containing "nice" in a channel the bot can see
-2. The bot will respond with "Nice!" and increment the counter
+The bot responds with randomized "nice" variations whenever someone says "nice":
 
-Examples:
+**How it works:**
+1. Type any message containing "nice" in a channel the bot can see
+2. The bot will respond with a random variation and increment the counter
+
+**Available responses** (10 total):
+- Nice! / Nice. / nice
+- Niceee / Niccceee
+- Very nice!
+- Noice! / Noice.
+- N🧊 (nice ice cube)
+- 👌 (OK hand emoji)
+
+**Examples:**
 - User: "nice"
-- Bot: "Nice!"
+- Bot: "Noice!" (or any other random response)
 
 - User: "That's really nice!"
-- Bot: "Nice!"
+- Bot: "Very nice!"
 
 - User: "NICE work!"
-- Bot: "Nice!"
+- Bot: "N🧊"
 
 ### Responding to "shut up"
 
@@ -277,9 +305,9 @@ Examples:
 
 ### Responding to "fuck dallas"
 
-The bot shows team spirit with randomized responses when "fuck dallas" is mentioned (no cooldown):
+The bot shows team spirit with randomized Eagles responses when "fuck dallas" is mentioned (no cooldown):
 
-Examples:
+**Examples:**
 - User: "fuck dallas"
 - Bot: "Cowgirls!" (or "Poverty franchise!", "Gang Green!", "Dallas ain't shit!", etc.)
 
@@ -289,7 +317,7 @@ Examples:
 - User: "FUCK DALLAS"
 - Bot: "America's most overrated team!"
 
-**Note:** This trigger has no cooldown and will respond every time "fuck dallas" is mentioned in any message. Uses the same 23 responses as the eagles trigger (both Eagles chants and anti-Dallas chants).
+**Note:** This trigger has no cooldown and will respond every time "fuck dallas" is mentioned in any message. Uses the same 23+ responses as the eagles trigger (both Eagles chants and anti-Dallas chants).
 
 #### Customizing Eagles Responses
 
