@@ -2,6 +2,7 @@
 
 import os
 import json
+import random
 from collections import defaultdict
 from . import BaseModule
 
@@ -14,6 +15,18 @@ class NiceTriggerModule(BaseModule):
         self.nice_counts = defaultdict(lambda: defaultdict(int))
         self.counts_file = os.path.join(data_dir, 'nice_counts.json')
         self.count_module = None
+        self.nice_responses = [
+            'Nice!',
+            'Nice.',
+            'nice',
+            'Niceee',
+            'Niccceee',
+            'Very nice!',
+            'Noice!',
+            'Noice.',
+            'N🧊',
+            '👌',
+        ]
 
     @property
     def name(self) -> str:
@@ -81,5 +94,6 @@ class NiceTriggerModule(BaseModule):
             if hasattr(self, 'count_module') and self.count_module:
                 self.count_module.nice_counts = self.nice_counts
 
-            # Send the response
-            await message.channel.send('Nice!')
+            # Send a random response
+            response = random.choice(self.nice_responses)
+            await message.channel.send(response)
