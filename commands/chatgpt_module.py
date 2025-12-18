@@ -119,17 +119,8 @@ class ChatGPTModule(BaseModule):
             embed = discord.Embed(
                 title="🤖 ChatGPT Response",
                 description=response_text,
-                color=discord.Color.green(),
-                timestamp=discord.utils.utcnow()
+                color=discord.Color.green()
             )
-
-            embed.add_field(
-                name="Prompt",
-                value=prompt[:1024] if len(prompt) <= 1024 else prompt[:1021] + "...",
-                inline=False
-            )
-
-            embed.set_footer(text="Powered by OpenAI GPT-4o-mini")
 
             # Edit the thinking message with response
             await thinking_msg.edit(content=None, embed=embed)
