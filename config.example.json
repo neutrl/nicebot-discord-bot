@@ -1,6 +1,7 @@
 {
   "bot_token": "your-discord-bot-token-here",
   "weather_api_key": "your-openweathermap-api-key-here",
+  "openai_api_key": "your-openai-api-key-here",
   "enabled_modules": [
     "weather",
     "count",
@@ -9,6 +10,8 @@
     "friday",
     "stock",
     "triggers",
+    "bartender",
+    "chatgpt",
     "nice_trigger",
     "shutup_trigger",
     "eagles_trigger",

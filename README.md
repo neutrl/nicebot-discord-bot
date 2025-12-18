@@ -4,6 +4,7 @@ A modular Discord bot with fun triggers, utility commands, and Philadelphia Eagl
 
 **Key Features:**
 - 🎉 **Interactive Triggers** - Responds to "nice", "shut up", "eagles", and more with randomized messages
+- 🤖 **AI Integration** - ChatGPT (GPT-4o-mini) for intelligent Q&A and conversations
 - 🌤️ **Weather Integration** - Real-time weather and forecasts with location saving
 - 📈 **Stock Ticker** - Live stock prices from Yahoo Finance
 - 🔍 **Web Search** - DuckDuckGo search integration
@@ -50,6 +51,7 @@ See [DOCKER.md](DOCKER.md) for complete Docker documentation.
 - **!setlocation** `<zip>` - Save your zip code for quick lookups
 - **!stock** `<ticker>` - Real-time stock prices, crypto, and indices (AAPL, BTC-USD, etc.)
 - **!quote** `[search]` - Random quote or search 1,008 quotes by keyword/ID
+- **!chat** `<prompt>` - Ask ChatGPT anything - get intelligent AI responses!
 - **!search** `<query>` - DuckDuckGo web search with top 5 results
 - **!friday** - Friday celebration (Rebecca Black) - Only works on Fridays, once per channel!
 - **!bartender** - Quick link to Bartender song on YouTube
@@ -76,6 +78,7 @@ The bot uses a modular system where you can enable or disable features individua
 | `quote` | Search and display quotes from database | `!quote` |
 | `friday` | Friday celebration (Rebecca Black video) | `!friday` |
 | `stock` | Real-time stock prices and market data | `!stock` |
+| `chatgpt` | OpenAI ChatGPT (GPT-4o-mini) integration | `!chat` |
 | `bartender` | Links to Bartender song on YouTube | `!bartender` |
 | `triggers` | Display bot help and information | `!triggers` |
 | `nice_trigger` | Responds with randomized "nice" variations (10 responses) | (automatic trigger) |
@@ -116,7 +119,7 @@ The bot uses a modular system where you can enable or disable features individua
 pip install -r requirements.txt
 ```
 
-### 4. Set Your Bot Token and Weather API Key
+### 4. Set Your Bot Token and API Keys
 
 #### Option 1: Config File (Recommended)
 
@@ -125,11 +128,12 @@ pip install -r requirements.txt
    cp config.example.json config.json
    ```
 
-2. Edit `config.json` and add your bot token, weather API key, and enabled modules:
+2. Edit `config.json` and add your bot token, API keys, and enabled modules:
    ```json
    {
      "bot_token": "your-discord-bot-token-here",
      "weather_api_key": "your-openweathermap-api-key-here",
+     "openai_api_key": "your-openai-api-key-here",
      "enabled_modules": [
        "weather",
        "count",
@@ -137,6 +141,7 @@ pip install -r requirements.txt
        "quote",
        "friday",
        "stock",
+       "chatgpt",
        "bartender",
        "triggers",
        "nice_trigger",
@@ -148,12 +153,22 @@ pip install -r requirements.txt
    }
    ```
 
-3. Get a free OpenWeatherMap API key:
+3. Get free API keys:
+
+   **OpenWeatherMap API (for weather commands):**
    - Go to [OpenWeatherMap](https://openweathermap.org/api)
    - Sign up for a free account
    - Navigate to "API keys" in your account settings
    - Copy your API key and add it to `config.json`
-   - Note: The weather API key is optional - the bot will work without it, but weather commands will not be available
+   - Note: Optional - the bot will work without it, but weather commands will not be available
+
+   **OpenAI API (for ChatGPT):**
+   - Go to [OpenAI Platform](https://platform.openai.com/api-keys)
+   - Sign in or create an account
+   - Click "Create new secret key"
+   - Copy your API key and add it to `config.json`
+   - Note: Optional - the bot will work without it, but `!chat` command will not be available
+   - Install the package: `pip install openai`
 
 #### Option 2: Environment Variable
 
@@ -594,6 +609,57 @@ Powered by Yahoo Finance • Data may be delayed
 - Prevents excessive API calls and provides faster responses
 
 **Note:** Yahoo Finance data may be delayed by 15-20 minutes for some exchanges. The stock module requires no API key and works immediately after enabling it in your config.
+
+### Chat Command (ChatGPT)
+
+Ask OpenAI's ChatGPT anything and get intelligent AI responses!
+
+```
+!chat What is the capital of France?
+```
+
+**Features:**
+- 🤖 **Powered by GPT-4o-mini** - Fast, intelligent, and cost-effective AI model
+- 💬 **Unlimited topics** - Ask about anything: facts, coding, creative writing, explanations, and more
+- 🎯 **Smart responses** - Get detailed, context-aware answers
+- ⚡ **Fast processing** - Responses typically arrive in seconds
+- 💰 **Cost-effective** - GPT-4o-mini is optimized for performance and affordability
+
+**Examples:**
+
+Ask factual questions:
+```
+!chat What is the capital of France?
+!chat How does photosynthesis work?
+!chat Who won the Super Bowl in 2024?
+```
+
+Get coding help:
+```
+!chat How do I write a Python function to reverse a string?
+!chat Explain what async/await means in JavaScript
+!chat What's the difference between SQL and NoSQL?
+```
+
+Creative writing:
+```
+!chat Write a haiku about the Eagles
+!chat Tell me a short joke about programming
+!chat Create a motivational quote about teamwork
+```
+
+**Setup:**
+1. Get an API key from [OpenAI Platform](https://platform.openai.com/api-keys)
+2. Add it to your `config.json` as `openai_api_key`
+3. Install the package: `pip install openai`
+4. Enable the `chatgpt` module in your config
+
+**Pricing:**
+- GPT-4o-mini is very affordable: ~$0.15 per 1M input tokens, ~$0.60 per 1M output tokens
+- Most chat responses cost less than $0.01
+- Check your usage at [OpenAI Usage Dashboard](https://platform.openai.com/usage)
+
+**Note:** Responses are truncated if they exceed Discord's 2000 character limit. Make sure you have API credits in your OpenAI account.
 
 ### Bartender Command
 

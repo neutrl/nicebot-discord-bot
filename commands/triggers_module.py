@@ -45,6 +45,7 @@ class TriggersModule(BaseModule):
             "**!setlocation** `<zip>` - Save your zip code\n"
             "**!stock** `<ticker>` - Stock prices (e.g., AAPL, BTC-USD)\n"
             "**!quote** `[search]` - Random quote or search quotes\n"
+            "**!chat** `<prompt>` - Ask ChatGPT anything 🤖\n"
             "**!friday** - Friday celebration (Fridays only!)\n"
             "**!bartender** - Link to Bartender song 🍹\n"
             "**!count** - Nice count statistics\n"
