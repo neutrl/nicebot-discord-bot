@@ -23,7 +23,7 @@ class TriggersModule(BaseModule):
             await self.triggers_command(ctx)
 
         self.bot.add_command(triggers_cmd)
-        print(f"✓ Loaded module: {self.name}")
+        self.logger.info(f"✓ Loaded module: {self.name}")
 
     async def teardown(self):
         """Clean up the triggers module."""

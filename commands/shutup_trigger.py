@@ -17,7 +17,7 @@ class ShutUpTriggerModule(BaseModule):
     async def setup(self):
         """Set up the shut up trigger module."""
         self.bot.add_listener(self.on_message, 'on_message')
-        print(f"✓ Loaded module: {self.name}")
+        self.logger.info(f"✓ Loaded module: {self.name}")
 
     async def teardown(self):
         """Clean up the shut up trigger module."""

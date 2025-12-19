@@ -27,7 +27,7 @@ class BartenderModule(BaseModule):
         # Add command to bot
         self.bot.add_command(bartender_cmd)
 
-        print(f"✓ Loaded module: {self.name}")
+        self.logger.info(f"✓ Loaded module: {self.name}")
 
     async def teardown(self):
         """Clean up the bartender module."""

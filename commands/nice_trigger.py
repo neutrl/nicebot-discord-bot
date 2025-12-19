@@ -40,7 +40,7 @@ class NiceTriggerModule(BaseModule):
         """Set up the nice trigger module."""
         self.load_counts()
         self.bot.add_listener(self.on_message, 'on_message')
-        print(f"✓ Loaded module: {self.name}")
+        self.logger.info(f"✓ Loaded module: {self.name}")
 
     async def teardown(self):
         """Clean up the nice trigger module."""
@@ -58,9 +58,9 @@ class NiceTriggerModule(BaseModule):
                     for server_id, channels in data.items():
                         for channel_id, count in channels.items():
                             self.nice_counts[server_id][channel_id] = count
-                print(f'  Loaded counts from {self.counts_file}')
+                self.logger.info(f\'Loaded counts from {self.counts_file}\')
         except Exception as e:
-            print(f'  Error loading counts: {e}')
+            self.logger.warning(f\'Error loading counts: {e}\')
 
     def save_counts(self):
         """Save counts to file."""
@@ -68,7 +68,7 @@ class NiceTriggerModule(BaseModule):
             with open(self.counts_file, 'w') as f:
                 json.dump(self.nice_counts, f, indent=2)
         except Exception as e:
-            print(f'  Error saving counts: {e}')
+            self.logger.error(f\'Error saving counts: {e}\')
 
     async def on_message(self, message):
         """Handle messages containing 'nice'."""

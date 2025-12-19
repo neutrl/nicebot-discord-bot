@@ -38,8 +38,8 @@ class ChatGPTModule(BaseModule):
         self._load_history()
 
         if not OPENAI_AVAILABLE:
-            print("  Warning: openai package not installed")
-            print("  Install with: pip install openai")
+            self.logger.warning("openai package not installed")
+            self.logger.warning("Install with: pip install openai")
         elif self.api_key:
             try:
                 # Strip any whitespace from the key
@@ -47,19 +47,19 @@ class ChatGPTModule(BaseModule):
 
                 # Debug: Show key format (first/last chars only for security)
                 if len(self.api_key) > 20:
-                    print(f"  OpenAI API key format: {self.api_key[:7]}...{self.api_key[-4:]} (length: {len(self.api_key)})")
+                    self.logger.debug(f"OpenAI API key format: {self.api_key[:7]}...{self.api_key[-4:]} (length: {len(self.api_key)})")
 
                 # Initialize the OpenAI client
                 self.client = OpenAI(api_key=self.api_key)
-                print(f"  Successfully configured OpenAI API client")
-                print(f"  Max conversation history: {self.max_history} message pairs per user")
+                self.logger.info("Successfully configured OpenAI API client")
+                self.logger.info(f"Max conversation history: {self.max_history} message pairs per user")
                 if self.allowed_channels:
-                    print(f"  Restricted to channels: {', '.join(self.allowed_channels)}")
+                    self.logger.info(f"Restricted to channels: {', '.join(self.allowed_channels)}")
                 else:
-                    print(f"  Available in all channels")
+                    self.logger.info("Available in all channels")
             except Exception as e:
-                print(f"  Error configuring OpenAI API: {e}")
-                print(f"  Error type: {type(e).__name__}")
+                self.logger.error(f"Error configuring OpenAI API: {e}")
+                self.logger.error(f"Error type: {type(e).__name__}")
 
     @property
     def name(self) -> str:
@@ -75,9 +75,9 @@ class ChatGPTModule(BaseModule):
             try:
                 with open(self.history_file, 'r') as f:
                     self.conversation_history = json.load(f)
-                print(f"  Loaded conversation history for {len(self.conversation_history)} users")
+                self.logger.info(f"Loaded conversation history for {len(self.conversation_history)} users")
             except Exception as e:
-                print(f"  Error loading conversation history: {e}")
+                self.logger.warning(f"Error loading conversation history: {e}")
                 self.conversation_history = {}
         else:
             self.conversation_history = {}
@@ -91,7 +91,7 @@ class ChatGPTModule(BaseModule):
             with open(self.history_file, 'w') as f:
                 json.dump(self.conversation_history, f, indent=2)
         except Exception as e:
-            print(f"  Error saving conversation history: {e}")
+            self.logger.error(f"Error saving conversation history: {e}")
 
     def _get_user_history(self, user_id: str) -> list:
         """Get conversation history for a specific user."""
@@ -142,7 +142,7 @@ class ChatGPTModule(BaseModule):
         # Add command to bot
         self.bot.add_command(chat_cmd)
 
-        print(f"✓ Loaded module: {self.name}")
+        self.logger.info(f"✓ Loaded module: {self.name}")
 
     async def teardown(self):
         """Clean up the chatgpt module."""
@@ -256,7 +256,7 @@ class ChatGPTModule(BaseModule):
             error_type = type(e).__name__
 
             # Log full error for debugging
-            print(f"ChatGPT Error: {error_type}: {error_message}")
+            self.logger.error(f"ChatGPT Error: {error_type}: {error_message}")
 
             if len(error_message) > 1800:
                 error_message = error_message[:1797] + "..."

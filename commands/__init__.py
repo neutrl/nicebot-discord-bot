@@ -5,6 +5,7 @@ Each module can be independently enabled/disabled via config.
 
 from abc import ABC, abstractmethod
 import discord
+import logging
 
 
 class BaseModule(ABC):
@@ -22,6 +23,8 @@ class BaseModule(ABC):
         self.bot = bot
         self.config = config
         self.data_dir = data_dir
+        # Create logger using module's name
+        self.logger = logging.getLogger(self.__class__.__module__)
 
     @property
     @abstractmethod

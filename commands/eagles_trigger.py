@@ -35,10 +35,10 @@ class EaglesTriggerModule(BaseModule):
                     data = json.load(f)
                     responses = [item['text'] for item in data.get('responses', [])]
                     if responses:
-                        print(f'  Loaded {len(responses)} Eagles responses from {self.responses_file}')
+                        self.logger.info(f\'Loaded {len(responses)} Eagles responses from {self.responses_file}\')
                         return responses
         except Exception as e:
-            print(f'  Error loading Eagles responses: {e}')
+            self.logger.warning(f\'Error loading Eagles responses: {e}\')
 
         # Fallback to default responses if file doesn't exist or has errors
         print(f'  Using default Eagles responses')
@@ -72,7 +72,7 @@ class EaglesTriggerModule(BaseModule):
         """Set up the eagles trigger module."""
         self.load_timestamp()
         self.bot.add_listener(self.on_message, 'on_message')
-        print(f"✓ Loaded module: {self.name}")
+        self.logger.info(f"✓ Loaded module: {self.name}")
 
     async def teardown(self):
         """Clean up the eagles trigger module."""
@@ -97,7 +97,7 @@ class EaglesTriggerModule(BaseModule):
                         self.last_eagles_response = {int(k): v for k, v in data.items()}
                         print(f'  Loaded eagles timestamps for {len(self.last_eagles_response)} channels')
         except Exception as e:
-            print(f'  Error loading eagles timestamp: {e}')
+            self.logger.warning(f\'Error loading eagles timestamp: {e}\')
             self.last_eagles_response = {}
 
     def cleanup_old_channels(self):
@@ -130,7 +130,7 @@ class EaglesTriggerModule(BaseModule):
             with open(self.eagles_file, 'w') as f:
                 json.dump(data_to_save, f, indent=2)
         except Exception as e:
-            print(f'  Error saving eagles timestamp: {e}')
+            self.logger.error(f\'Error saving eagles timestamp: {e}\')
 
     async def on_message(self, message):
         """Handle messages containing 'eagles' with per-channel cooldown."""

@@ -11,6 +11,8 @@ services:
     environment:
       # Fallback to environment variable if config.json not used
       - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN:-}
+      # Log level configuration (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
     # Uncomment below to see logs in real-time
     # stdin_open: true
     # tty: true
