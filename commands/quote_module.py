@@ -48,6 +48,92 @@ class QuoteModule(BaseModule):
         except Exception as e:
             print(f"Error saving quotes: {e}")
 
+    def get_next_quote_id(self) -> int:
+        """Get the next available quote ID."""
+        if not self.quotes:
+            return 1
+
+        max_id = max(quote.get('id', 0) for quote in self.quotes)
+        return max_id + 1
+
+    def can_add_quote(self, ctx) -> bool:
+        """
+        Check if the user has permission to add quotes.
+
+        Args:
+            ctx: Discord context
+
+        Returns:
+            True if user can add quotes, False otherwise
+        """
+        # Get allowed roles from config
+        allowed_roles = self.config.get('quote_add_roles', [])
+
+        # If empty list, anyone can add
+        if not allowed_roles:
+            return True
+
+        # Check if user has any of the allowed roles
+        if ctx.guild:
+            user_roles = [role.name for role in ctx.author.roles]
+            return any(role in allowed_roles for role in user_roles)
+
+        # In DMs, deny by default
+        return False
+
+    def create_quote_from_message(self, message, quote_text: str = None) -> dict:
+        """
+        Create a quote dictionary from a Discord message.
+
+        Args:
+            message: Discord message object
+            quote_text: Optional custom quote text (defaults to message content)
+
+        Returns:
+            Quote dictionary with full metadata
+        """
+        import datetime
+
+        quote_id = self.get_next_quote_id()
+
+        quote = {
+            "id": quote_id,
+            "quote": quote_text or message.content,
+            "author": {
+                "id": str(message.author.id),
+                "username": message.author.name
+            },
+            "created_at": datetime.datetime.utcnow().isoformat() + "Z"
+        }
+
+        # Add channel metadata if in a guild
+        if message.guild:
+            quote["channel"] = {
+                "id": str(message.channel.id),
+                "name": message.channel.name,
+                "guild": message.guild.name
+            }
+
+        return quote
+
+    def add_quote(self, quote: dict) -> bool:
+        """
+        Add a quote to the collection and save to file.
+
+        Args:
+            quote: Quote dictionary
+
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            self.quotes.append(quote)
+            self.save_quotes()
+            return True
+        except Exception as e:
+            self.logger.error(f"Error adding quote: {e}")
+            return False
+
     async def setup(self):
         """Set up the quote module."""
 
@@ -56,14 +142,21 @@ class QuoteModule(BaseModule):
         async def quote_cmd(ctx, *, search_term: str = None):
             await self.quote_command(ctx, search_term=search_term)
 
-        # Add command to bot
+        # Create wrapper function for the addquote command
+        @commands.command(name='addquote')
+        async def addquote_cmd(ctx, *, quote_text: str = None):
+            await self.addquote_command(ctx, quote_text=quote_text)
+
+        # Add commands to bot
         self.bot.add_command(quote_cmd)
+        self.bot.add_command(addquote_cmd)
 
         self.logger.info(f"✓ Loaded module: {self.name}")
 
     async def teardown(self):
         """Clean up the quote module."""
         self.bot.remove_command('quote')
+        self.bot.remove_command('addquote')
 
     def search_quotes(self, search_term: str) -> list:
         """
@@ -177,3 +270,82 @@ class QuoteModule(BaseModule):
         """Display a single quote as an embed."""
         embed = self.create_quote_embed(quote)
         await ctx.send(embed=embed)
+
+    async def addquote_command(self, ctx, *, quote_text: str = None):
+        """
+        Add a new quote to the collection.
+
+        Supports two methods:
+        1. Reply to a message with !addquote (captures that message)
+        2. Type !addquote <text> (adds custom text as quote)
+
+        Args:
+            ctx: Discord context
+            quote_text: Optional quote text (if not replying to a message)
+        """
+        # Check permissions
+        if not self.can_add_quote(ctx):
+            allowed_roles = self.config.get('quote_add_roles', [])
+            roles_str = ", ".join(allowed_roles) if allowed_roles else "Admin"
+            await ctx.send(f"❌ You don't have permission to add quotes. Required role(s): **{roles_str}**")
+            return
+
+        # Method 1: Reply to a message
+        if ctx.message.reference:
+            try:
+                # Get the message being replied to
+                replied_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+
+                # Create quote from the replied message
+                quote = self.create_quote_from_message(replied_message)
+
+                # Add to collection
+                if self.add_quote(quote):
+                    # Create success embed
+                    embed = discord.Embed(
+                        title="✅ Quote Added!",
+                        description=f"Quote #{quote['id']} has been added to the collection.",
+                        color=discord.Color.green()
+                    )
+                    embed.add_field(name="Quote", value=quote['quote'][:1024], inline=False)
+                    embed.add_field(name="Author", value=f"<@{quote['author']['id']}>", inline=True)
+                    embed.add_field(name="Total Quotes", value=str(len(self.quotes)), inline=True)
+
+                    await ctx.send(embed=embed)
+                    self.logger.info(f"Quote #{quote['id']} added by {ctx.author.name} (reply method)")
+                else:
+                    await ctx.send("❌ Failed to save quote. Check bot logs for details.")
+            except Exception as e:
+                self.logger.error(f"Error fetching replied message: {e}")
+                await ctx.send("❌ Failed to fetch the message you replied to.")
+            return
+
+        # Method 2: Direct text input
+        if quote_text:
+            # Create quote from current message context
+            quote = self.create_quote_from_message(ctx.message, quote_text=quote_text)
+
+            # Add to collection
+            if self.add_quote(quote):
+                # Create success embed
+                embed = discord.Embed(
+                    title="✅ Quote Added!",
+                    description=f"Quote #{quote['id']} has been added to the collection.",
+                    color=discord.Color.green()
+                )
+                embed.add_field(name="Quote", value=quote['quote'][:1024], inline=False)
+                embed.add_field(name="Added By", value=f"<@{ctx.author.id}>", inline=True)
+                embed.add_field(name="Total Quotes", value=str(len(self.quotes)), inline=True)
+
+                await ctx.send(embed=embed)
+                self.logger.info(f"Quote #{quote['id']} added by {ctx.author.name} (direct method)")
+            else:
+                await ctx.send("❌ Failed to save quote. Check bot logs for details.")
+            return
+
+        # No quote provided
+        await ctx.send(
+            "❌ Please provide a quote using one of these methods:\n\n"
+            "**Method 1:** Reply to a message with `!addquote`\n"
+            "**Method 2:** Type `!addquote <your quote text here>`"
+        )

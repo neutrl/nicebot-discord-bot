@@ -51,6 +51,7 @@ See [DOCKER.md](DOCKER.md) for complete Docker documentation.
 - **!setlocation** `<zip>` - Save your zip code for quick lookups
 - **!stock** `<ticker>` - Real-time stock prices, crypto, and indices (AAPL, BTC-USD, etc.)
 - **!quote** `[search]` - Random quote or search 1,008 quotes by keyword/ID
+- **!addquote** `<text>` - Add a new quote to the collection (role-restricted)
 - **!chat** `<prompt>` - Chat with AI (remembers conversation context per user)
   - **!chat reset** - Clear your conversation history
   - **!chat history** - View your conversation stats
@@ -499,6 +500,78 @@ Examples:
 The bot will search for quotes containing your keyword and display a random matching result with the quote ID.
 
 **Quote Database**: Quotes are stored in `data/quotes.json` (1,008 quotes total). The bot will display how many matching quotes were found for your search term.
+
+### Add Quote Command
+
+Add new quotes to the collection with full metadata capture!
+
+```
+!addquote <your quote text here>
+```
+
+Or reply to any message with:
+```
+!addquote
+```
+
+**Features:**
+- 📝 **Two input methods** - Type quote text directly OR reply to any message
+- 🔒 **Role-based permissions** - Restrict who can add quotes via configuration
+- 📊 **Full metadata** - Captures author, channel, timestamp, and guild information
+- 🔢 **Auto-increment IDs** - Automatically assigns the next sequential ID
+- 💾 **Instant save** - Quotes are immediately saved to `data/quotes.json`
+
+**Examples:**
+
+Add a quote by typing text:
+```
+!addquote The only thing we have to fear is fear itself
+```
+
+Add a quote by replying to a message:
+1. Right-click any message and select "Reply"
+2. Type `!addquote` in the reply
+3. The bot will capture the original message as a quote
+
+**Quote Metadata:**
+
+When you add a quote, the bot captures:
+- **Quote ID** - Auto-assigned sequential number (starting at 1009)
+- **Quote text** - The message content
+- **Author** - Discord user ID and username
+- **Channel** - Channel ID, name, and server/guild name
+- **Timestamp** - ISO 8601 UTC timestamp (e.g., "2025-12-18T12:34:56.789Z")
+
+**Configuration:**
+
+Control who can add quotes by editing `config.json`:
+
+```json
+{
+  "quote_add_roles": ["Admin", "Moderator", "Trusted"]
+}
+```
+
+- **Empty array `[]`**: Anyone can add quotes (default)
+- **List of role names**: Only users with those roles can add quotes
+- Role names are case-sensitive and must match exactly
+
+**Example permission denied response:**
+```
+❌ You don't have permission to add quotes. Required role(s): Admin, Moderator
+```
+
+**Example success response:**
+```
+✅ Quote Added!
+Quote #1009 has been added to the collection.
+
+Quote: "The only thing we have to fear is fear itself"
+Added By: @YourUsername
+Total Quotes: 1009
+```
+
+**Note:** Added quotes immediately appear in `!quote` searches and can be retrieved by their assigned ID number.
 
 ### Friday Command
 

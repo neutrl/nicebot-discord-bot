@@ -5,6 +5,7 @@
   "chatgpt_max_history": 10,
   "chatgpt_system_message": "You are a helpful assistant.",
   "chatgpt_channels": [],
+  "quote_add_roles": ["Admin", "Moderator", "Trusted"],
   "enabled_modules": [
     "weather",
     "count",

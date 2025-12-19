@@ -45,6 +45,7 @@ class TriggersModule(BaseModule):
             "**!setlocation** `<zip>` - Save your zip code\n"
             "**!stock** `<ticker>` - Stock prices (e.g., AAPL, BTC-USD)\n"
             "**!quote** `[search]` - Random quote or search quotes\n"
+            "**!addquote** `<text>` or reply to message - Add a new quote 📝\n"
             "**!chat** `<prompt>` - Chat with AI (remembers context) 🤖\n"
             "  • `!chat reset` - Clear your conversation\n"
             "  • `!chat history` - Show conversation stats\n"
