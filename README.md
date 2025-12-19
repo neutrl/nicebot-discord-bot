@@ -88,6 +88,107 @@ The bot uses a modular system where you can enable or disable features individua
 | `shutup_trigger` | Responds "No, u!" to messages containing "shut up" | (automatic trigger) |
 | `eagles_trigger` | Random Eagles chants for messages containing "eagles" | (automatic trigger) |
 | `dallas_trigger` | Random Eagles chants for messages containing "fuck dallas" | (automatic trigger) |
+| `backup` | Automatic Dropbox backups of all bot data | `!backup` |
+
+## Automatic Dropbox Backups
+
+The bot includes automatic backup functionality to protect your data by uploading all bot files to Dropbox.
+
+**Features:**
+- 🔄 **Automatic backups** - Scheduled backups every 6 hours (configurable)
+- ☁️ **Dropbox integration** - Secure cloud storage for all data files
+- 📦 **Complete backups** - Includes all data files, config, and responses
+- 🗑️ **Automatic cleanup** - Removes backups older than 30 days (configurable)
+- 💾 **Manual backups** - Use `!backup` command anytime (admin only)
+- 📝 **Console logging** - All backup operations logged for troubleshooting
+
+### Setup Dropbox Backups
+
+1. **Get a Dropbox Access Token:**
+   - Go to [Dropbox App Console](https://www.dropbox.com/developers/apps)
+   - Click "Create app"
+   - Choose "Scoped access"
+   - Choose "Full Dropbox" or "App folder" access type
+   - Give your app a name (e.g., "NiceBot Backups")
+   - Click "Create app"
+   - In the "Permissions" tab, enable: `files.metadata.write`, `files.content.write`, `files.content.read`
+   - In the "Settings" tab, scroll to "Generated access token"
+   - Click "Generate" and copy your access token
+
+2. **Add Configuration:**
+
+   Edit `config.json` and add your Dropbox settings:
+   ```json
+   {
+     "dropbox_access_token": "your-dropbox-token-here",
+     "dropbox_backup_enabled": true,
+     "dropbox_backup_folder": "/NiceBotBackups",
+     "dropbox_backup_interval_hours": 6,
+     "dropbox_backup_on_startup": true,
+     "dropbox_retention_days": 30
+   }
+   ```
+
+3. **Install Dropbox Library:**
+   ```bash
+   pip install dropbox
+   ```
+
+4. **Enable the Module:**
+
+   Add `"backup"` to your `enabled_modules` list in `config.json`:
+   ```json
+   {
+     "enabled_modules": [
+       "weather",
+       "count",
+       "quote",
+       "backup"
+     ]
+   }
+   ```
+
+### Configuration Options
+
+- `dropbox_access_token` - Your Dropbox API access token (required)
+- `dropbox_backup_enabled` - Enable/disable automatic backups (default: true)
+- `dropbox_backup_folder` - Dropbox folder path for backups (default: "/NiceBotBackups")
+- `dropbox_backup_interval_hours` - Hours between automatic backups (default: 6)
+- `dropbox_backup_on_startup` - Perform backup when bot starts (default: true)
+- `dropbox_retention_days` - Days to keep old backups (default: 30)
+
+### What Gets Backed Up
+
+Each backup is a timestamped ZIP file containing:
+- All files in the `data/` directory (quotes, counts, locations, etc.)
+- `config.json` (with all API tokens for complete restoration)
+- `eagles_responses.json`
+
+**Example backup filename:** `nicebot_backup_2025-12-19_14-30-00.zip`
+
+### Manual Backup Command
+
+Administrators can trigger a manual backup anytime:
+```
+!backup
+```
+
+The bot will create and upload a backup immediately, regardless of the automatic schedule.
+
+### Restoring from Backup
+
+To restore your bot data from a Dropbox backup:
+
+1. Go to your Dropbox folder (e.g., `/NiceBotBackups`)
+2. Download the backup ZIP file you want to restore
+3. Extract the ZIP file contents
+4. Copy the extracted files to your bot directory:
+   - Copy `data/*` files to your bot's `data/` directory
+   - Copy `config.json` to your bot's root directory
+   - Copy `eagles_responses.json` to your bot's root directory
+5. Restart the bot
+
+**Note:** Backups include API tokens and sensitive data. Keep your Dropbox account secure and never share backup files publicly.
 
 ## Setup Instructions
 

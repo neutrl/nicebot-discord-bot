@@ -3,4 +3,5 @@ aiohttp>=3.9.0
 ddgs>=1.0.0
 yfinance>=0.2.0
 openai>=1.0.0
+dropbox>=11.36.0
 

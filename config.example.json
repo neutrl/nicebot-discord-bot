@@ -21,5 +21,11 @@
     "eagles_trigger",
     "dallas_trigger"
   ],
-  "eagles_cooldown": 600
+  "eagles_cooldown": 600,
+  "dropbox_access_token": "",
+  "dropbox_backup_enabled": true,
+  "dropbox_backup_folder": "/NiceBotBackups",
+  "dropbox_backup_interval_hours": 6,
+  "dropbox_backup_on_startup": true,
+  "dropbox_retention_days": 30
 }

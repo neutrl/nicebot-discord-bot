@@ -85,6 +85,7 @@ def load_module(module_name: str, config: dict):
             'shutup_trigger': ('commands.shutup_trigger', 'ShutUpTriggerModule'),
             'eagles_trigger': ('commands.eagles_trigger', 'EaglesTriggerModule'),
             'dallas_trigger': ('commands.dallas_trigger', 'DallasTriggerModule'),
+            'backup': ('commands.backup_module', 'BackupModule'),
         }
 
         if module_name not in module_map:
