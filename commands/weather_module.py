@@ -64,9 +64,9 @@ class WeatherModule(BaseModule):
             if os.path.exists(self.locations_file):
                 with open(self.locations_file, 'r') as f:
                     self.user_locations = json.load(f)
-                self.logger.info(f\'Loaded user locations from {self.locations_file}\')
+                self.logger.info(f'Loaded user locations from {self.locations_file}')
         except Exception as e:
-            self.logger.warning(f\'Error loading locations: {e}\')
+            self.logger.warning(f'Error loading locations: {e}')
 
     def save_locations(self):
         """Save user locations to file."""
@@ -74,7 +74,7 @@ class WeatherModule(BaseModule):
             with open(self.locations_file, 'w') as f:
                 json.dump(self.user_locations, f, indent=2)
         except Exception as e:
-            self.logger.error(f\'Error saving locations: {e}\')
+            self.logger.error(f'Error saving locations: {e}')
 
     async def fetch_weather(self, zip_code, country_code='US'):
         """Fetch weather data from OpenWeatherMap API."""

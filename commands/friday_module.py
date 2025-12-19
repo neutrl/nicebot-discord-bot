@@ -52,7 +52,7 @@ class FridayModule(BaseModule):
                     self.usage_data = json.load(f)
                 print(f'  Loaded Friday usage data for {len(self.usage_data)} channels')
         except Exception as e:
-            self.logger.warning(f\'Error loading Friday usage: {e}\')
+            self.logger.warning(f'Error loading Friday usage: {e}')
             self.usage_data = {}
 
     def save_usage(self):
@@ -64,7 +64,7 @@ class FridayModule(BaseModule):
             with open(self.usage_file, 'w') as f:
                 json.dump(self.usage_data, f, indent=2)
         except Exception as e:
-            self.logger.error(f\'Error saving Friday usage: {e}\')
+            self.logger.error(f'Error saving Friday usage: {e}')
 
     def cleanup_old_usage(self):
         """Remove usage records older than cleanup_days to prevent unbounded growth."""

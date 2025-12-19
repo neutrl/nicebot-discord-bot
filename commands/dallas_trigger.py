@@ -30,13 +30,13 @@ class DallasTriggerModule(BaseModule):
                     data = json.load(f)
                     responses = [item['text'] for item in data.get('responses', [])]
                     if responses:
-                        self.logger.info(f\'Loaded {len(responses)} Eagles responses from {self.responses_file}\')
+                        self.logger.info(f'Loaded {len(responses)} Eagles responses from {self.responses_file}')
                         return responses
         except Exception as e:
-            self.logger.warning(f\'Error loading Eagles responses: {e}\')
+            self.logger.warning(f'Error loading Eagles responses: {e}')
 
         # Fallback to default responses if file doesn't exist or has errors
-        print(f'  Using default Eagles responses')
+        self.logger.warning('Using default Eagles responses')
         return [
             'Go Birds!',
             'da birds!',
