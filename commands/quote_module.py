@@ -96,9 +96,16 @@ class QuoteModule(BaseModule):
 
         quote_id = self.get_next_quote_id()
 
+        # If no custom quote_text provided (reply method), format as "<name>: <quote>"
+        # If custom quote_text provided (direct method), use it as-is
+        if quote_text is None:
+            formatted_quote = f"{message.author.name}: {message.content}"
+        else:
+            formatted_quote = quote_text
+
         quote = {
             "id": quote_id,
-            "quote": quote_text or message.content,
+            "quote": formatted_quote,
             "author": {
                 "id": str(message.author.id),
                 "username": message.author.name
