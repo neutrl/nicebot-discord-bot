@@ -108,7 +108,7 @@ class QuoteModule(BaseModule):
             "quote": formatted_quote,
             "author": {
                 "id": str(message.author.id),
-                "username": message.author.name
+                "username": message.author.display_name
             },
             "created_at": datetime.datetime.utcnow().isoformat() + "Z"
         }
