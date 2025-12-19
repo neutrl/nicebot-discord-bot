@@ -53,6 +53,7 @@ class TriggersModule(BaseModule):
             "**!bartender** - Link to Bartender song 🍹\n"
             "**!count** - Nice count statistics\n"
             "**!search** `<query>` - DuckDuckGo search\n"
+            "**!backup** - Manual backup to Dropbox (admin only) ☁️\n"
             "**!triggers** - Show this help message"
         )
         embed.add_field(
