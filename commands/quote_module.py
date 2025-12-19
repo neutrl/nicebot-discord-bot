@@ -99,7 +99,7 @@ class QuoteModule(BaseModule):
         # If no custom quote_text provided (reply method), format as "<name>: <quote>"
         # If custom quote_text provided (direct method), use it as-is
         if quote_text is None:
-            formatted_quote = f"{message.author.name}: {message.content}"
+            formatted_quote = f"{message.author.display_name}: {message.content}"
         else:
             formatted_quote = quote_text
 
