@@ -679,11 +679,15 @@ Creative writing:
 {
   "openai_api_key": "your-api-key-here",
   "chatgpt_max_history": 10,
-  "chatgpt_system_message": "You are a helpful assistant."
+  "chatgpt_system_message": "You are a helpful assistant.",
+  "chatgpt_channels": []
 }
 ```
 - `chatgpt_max_history` - Maximum message pairs to remember per user (default: 10)
 - `chatgpt_system_message` - System prompt that defines the AI's behavior
+- `chatgpt_channels` - List of channel names where !chat is allowed (empty = all channels)
+  - Example: `["bot-commands", "general"]` to restrict to only those channels
+  - Default: `[]` (available in all channels)
 
 **Conversation Management:**
 - The bot stores up to 10 message exchanges per user by default

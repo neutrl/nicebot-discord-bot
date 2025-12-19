@@ -27,6 +27,9 @@ class ChatGPTModule(BaseModule):
         self.max_history = config.get('chatgpt_max_history', 10)  # Max message pairs per user
         self.system_message = config.get('chatgpt_system_message', "You are a helpful assistant.")
 
+        # Channel whitelist - empty list means all channels allowed
+        self.allowed_channels = config.get('chatgpt_channels', [])
+
         # Path to store conversation history
         self.history_file = Path(data_dir) / "chatgpt_history.json"
         self.conversation_history = {}
@@ -50,6 +53,10 @@ class ChatGPTModule(BaseModule):
                 self.client = OpenAI(api_key=self.api_key)
                 print(f"  Successfully configured OpenAI API client")
                 print(f"  Max conversation history: {self.max_history} message pairs per user")
+                if self.allowed_channels:
+                    print(f"  Restricted to channels: {', '.join(self.allowed_channels)}")
+                else:
+                    print(f"  Available in all channels")
             except Exception as e:
                 print(f"  Error configuring OpenAI API: {e}")
                 print(f"  Error type: {type(e).__name__}")
@@ -144,6 +151,11 @@ class ChatGPTModule(BaseModule):
 
     async def chat_command(self, ctx, *, prompt: str = None):
         """Ask ChatGPT a question and return the response."""
+        # Check if command is allowed in this channel
+        if self.allowed_channels and ctx.channel.name not in self.allowed_channels:
+            # Silently ignore if not in allowed channels
+            return
+
         if not prompt:
             await ctx.send("Please provide a prompt. Example: `!chat What is the capital of France?`\n\n"
                           "**Special commands:**\n"
