@@ -81,13 +81,14 @@ class QuoteModule(BaseModule):
         # In DMs, deny by default
         return False
 
-    def create_quote_from_message(self, message, quote_text: str = None) -> dict:
+    def create_quote_from_message(self, message, quote_text: str = None, member=None) -> dict:
         """
         Create a quote dictionary from a Discord message.
 
         Args:
             message: Discord message object
             quote_text: Optional custom quote text (defaults to message content)
+            member: Optional Discord Member object (for accessing server nickname)
 
         Returns:
             Quote dictionary with full metadata
@@ -96,10 +97,16 @@ class QuoteModule(BaseModule):
 
         quote_id = self.get_next_quote_id()
 
+        # Get display name from member if available, otherwise from message.author
+        if member:
+            display_name = member.display_name
+        else:
+            display_name = message.author.display_name
+
         # If no custom quote_text provided (reply method), format as "<name>: <quote>"
         # If custom quote_text provided (direct method), use it as-is
         if quote_text is None:
-            formatted_quote = f"{message.author.display_name}: {message.content}"
+            formatted_quote = f"{display_name}: {message.content}"
         else:
             formatted_quote = quote_text
 
@@ -108,7 +115,7 @@ class QuoteModule(BaseModule):
             "quote": formatted_quote,
             "author": {
                 "id": str(message.author.id),
-                "username": message.author.display_name
+                "username": display_name
             },
             "created_at": datetime.datetime.utcnow().isoformat() + "Z"
         }
@@ -303,8 +310,17 @@ class QuoteModule(BaseModule):
                 # Get the message being replied to
                 replied_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
 
-                # Create quote from the replied message
-                quote = self.create_quote_from_message(replied_message)
+                # Get the member object to access server nickname
+                member = None
+                if ctx.guild:
+                    try:
+                        member = await ctx.guild.fetch_member(replied_message.author.id)
+                    except:
+                        # If we can't fetch the member, use the user object
+                        pass
+
+                # Create quote from the replied message, passing member if available
+                quote = self.create_quote_from_message(replied_message, member=member)
 
                 # Add to collection
                 if self.add_quote(quote):
