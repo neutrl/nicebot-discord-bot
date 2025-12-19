@@ -230,7 +230,6 @@ class QuoteModule(BaseModule):
 
             if quote:
                 embed = self.create_quote_embed(quote)
-                embed.set_footer(text=f"Quote retrieved by ID: {quote_id}")
                 await ctx.send(embed=embed)
             else:
                 await ctx.send(f"❌ No quote found with ID: **{quote_id}**\nTry `!quote` for a random quote.")
@@ -246,14 +245,8 @@ class QuoteModule(BaseModule):
         # Return a random matching quote if multiple results
         quote = random.choice(matching_quotes)
 
-        # Create embed with search info
+        # Create embed
         embed = self.create_quote_embed(quote)
-
-        # Add search info to footer
-        if len(matching_quotes) > 1:
-            embed.set_footer(text=f"Found {len(matching_quotes)} matching quotes for '{search_term}'")
-        else:
-            embed.set_footer(text=f"Found 1 matching quote for '{search_term}'")
 
         await ctx.send(embed=embed)
 
