@@ -19,7 +19,8 @@
     "nice_trigger",
     "shutup_trigger",
     "eagles_trigger",
-    "dallas_trigger"
+    "dallas_trigger",
+    "backup"
   ],
   "eagles_cooldown": 600,
   "dropbox_access_token": "",
