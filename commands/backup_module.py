@@ -22,6 +22,9 @@ class BackupModule(BaseModule):
     def __init__(self, bot, config: dict, data_dir: str):
         super().__init__(bot, config, data_dir)
         self.dropbox_token = config.get('dropbox_access_token', '')
+        self.dropbox_refresh_token = config.get('dropbox_refresh_token', '')
+        self.dropbox_app_key = config.get('dropbox_app_key', '')
+        self.dropbox_app_secret = config.get('dropbox_app_secret', '')
         self.backup_enabled = config.get('dropbox_backup_enabled', True)
         self.backup_folder = config.get('dropbox_backup_folder', '/NiceBotBackups')
         self.backup_interval_hours = config.get('dropbox_backup_interval_hours', 6)
@@ -29,6 +32,8 @@ class BackupModule(BaseModule):
         self.retention_days = config.get('dropbox_retention_days', 30)
         self.dbx = None
         self.last_backup_time = None
+        self.config = config
+        self.config_path = "config.json"
 
     @property
     def name(self) -> str:
@@ -48,13 +53,28 @@ class BackupModule(BaseModule):
             self.logger.info("✓ Loaded module: backup (disabled)")
             return
 
-        if not self.dropbox_token:
-            self.logger.warning("✓ Loaded module: backup (no access token configured)")
+        if not self.dropbox_token and not self.dropbox_refresh_token:
+            self.logger.warning("✓ Loaded module: backup (no access token or refresh token configured)")
             return
 
-        # Initialize Dropbox client
+        # Initialize Dropbox client with refresh token support
         try:
-            self.dbx = dropbox.Dropbox(self.dropbox_token)
+            if self.dropbox_refresh_token and self.dropbox_app_key and self.dropbox_app_secret:
+                # Use OAuth2 with refresh token (recommended for long-term use)
+                self.dbx = dropbox.Dropbox(
+                    oauth2_refresh_token=self.dropbox_refresh_token,
+                    app_key=self.dropbox_app_key,
+                    app_secret=self.dropbox_app_secret
+                )
+                self.logger.info("✓ Dropbox initialized with refresh token (auto-refresh enabled)")
+            elif self.dropbox_token:
+                # Use legacy access token (will not auto-refresh)
+                self.dbx = dropbox.Dropbox(self.dropbox_token)
+                self.logger.info("✓ Dropbox initialized with access token (no auto-refresh)")
+            else:
+                self.logger.warning("✓ Loaded module: backup (insufficient credentials)")
+                return
+
             # Test authentication
             self.dbx.users_get_current_account()
             self.logger.info("✓ Dropbox authentication successful")

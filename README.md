@@ -104,6 +104,10 @@ The bot includes automatic backup functionality to protect your data by uploadin
 
 ### Setup Dropbox Backups
 
+You can use either a simple access token (quick setup) or OAuth2 with refresh token (recommended for long-term use with automatic token refresh).
+
+#### Option 1: Quick Setup with Access Token (Simple)
+
 1. **Get a Dropbox Access Token:**
    - Go to [Dropbox App Console](https://www.dropbox.com/developers/apps)
    - Click "Create app"
@@ -129,6 +133,54 @@ The bot includes automatic backup functionality to protect your data by uploadin
    }
    ```
 
+#### Option 2: OAuth2 with Refresh Token (Recommended - Auto-Refresh)
+
+For long-term deployments, use OAuth2 with a refresh token that automatically renews:
+
+1. **Create Dropbox App (same as above):**
+   - Go to [Dropbox App Console](https://www.dropbox.com/developers/apps)
+   - Create app with "Scoped access" and required permissions
+   - Note your **App key** and **App secret** from the Settings tab
+
+2. **Get a Refresh Token:**
+
+   Use the Dropbox OAuth2 flow to get a refresh token. You can use this Python script:
+
+   ```python
+   from dropbox import DropboxOAuth2FlowNoRedirect
+
+   APP_KEY = "your-app-key"
+   APP_SECRET = "your-app-secret"
+
+   auth_flow = DropboxOAuth2FlowNoRedirect(APP_KEY, APP_SECRET, token_access_type='offline')
+   authorize_url = auth_flow.start()
+   print(f"1. Go to: {authorize_url}")
+   print("2. Click 'Allow' (you might have to log in first)")
+   print("3. Copy the authorization code")
+   auth_code = input("Enter the authorization code here: ").strip()
+
+   oauth_result = auth_flow.finish(auth_code)
+   print(f"\nRefresh Token: {oauth_result.refresh_token}")
+   ```
+
+3. **Add Configuration:**
+
+   Edit `config.json` with OAuth2 credentials:
+   ```json
+   {
+     "dropbox_refresh_token": "your-refresh-token-here",
+     "dropbox_app_key": "your-app-key-here",
+     "dropbox_app_secret": "your-app-secret-here",
+     "dropbox_backup_enabled": true,
+     "dropbox_backup_folder": "/NiceBotBackups",
+     "dropbox_backup_interval_hours": 6,
+     "dropbox_backup_on_startup": true,
+     "dropbox_retention_days": 30
+   }
+   ```
+
+   **Note:** When using refresh token, leave `dropbox_access_token` empty. The module will automatically use the refresh token instead.
+
 3. **Install Dropbox Library:**
    ```bash
    pip install dropbox
@@ -150,7 +202,13 @@ The bot includes automatic backup functionality to protect your data by uploadin
 
 ### Configuration Options
 
-- `dropbox_access_token` - Your Dropbox API access token (required)
+**Authentication (choose one method):**
+- `dropbox_access_token` - Simple access token (quick setup, no auto-refresh)
+- `dropbox_refresh_token` - OAuth2 refresh token (recommended, auto-refreshes)
+- `dropbox_app_key` - Required when using refresh token
+- `dropbox_app_secret` - Required when using refresh token
+
+**Backup Settings:**
 - `dropbox_backup_enabled` - Enable/disable automatic backups (default: true)
 - `dropbox_backup_folder` - Dropbox folder path for backups (default: "/NiceBotBackups")
 - `dropbox_backup_interval_hours` - Hours between automatic backups (default: 6)
