@@ -285,68 +285,67 @@ class WeatherModule(BaseModule):
 
         wind_direction = get_wind_direction(wind_deg)
 
+        # Convert pressure from hPa to inHg for US audience
+        pressure_inhg = pressure * 0.02953
+
         # Create enhanced weather embed
         embed = discord.Embed(
-            title=f"{weather_emoji} Weather in {location}",
+            title=f"{weather_emoji} {location}",
             description=f"**{description}**",
             color=color,
             timestamp=discord.utils.utcnow()
         )
 
-        # Main temperature display (bigger, centered)
-        temp_value = f"# {temp:.0f}°F\nFeels like **{feels_like:.0f}°F**"
+        # Main temperature display - clean and prominent
+        temp_value = f"**{temp:.0f}°F**"
+        if feels_like != temp:
+            temp_value += f"  •  Feels like {feels_like:.0f}°F"
 
         # Add high/low if available
         if today_high is not None and today_low is not None:
-            temp_value += f"\nHigh: **{today_high:.0f}°F** | Low: **{today_low:.0f}°F**"
+            temp_value += f"\nH: {today_high:.0f}°  L: {today_low:.0f}°"
 
         embed.add_field(
-            name="🌡️ Current Temperature",
+            name="🌡️ Temperature",
             value=temp_value,
             inline=False
         )
 
-        # Humidity
-        humidity_emoji = "💧" if humidity > 70 else "💨"
+        # Row 1: Conditions
         embed.add_field(
-            name=f"{humidity_emoji} Humidity",
-            value=f"**{humidity}%**",
+            name="💧 Humidity",
+            value=f"{humidity}%",
             inline=True
         )
 
-        # Dew Point
         embed.add_field(
-            name="💧 Dew Point",
-            value=f"**{dew_point:.0f}°F**",
+            name="🌡️ Dew Point",
+            value=f"{dew_point:.0f}°F",
             inline=True
         )
 
-        # Wind
         embed.add_field(
             name="🌬️ Wind",
-            value=f"**{wind_speed:.1f} mph** {wind_direction}",
+            value=f"{wind_speed:.0f} mph {wind_direction}",
             inline=True
         )
 
-        # Additional details
+        # Row 2: Additional details
         embed.add_field(
             name="👁️ Visibility",
-            value=f"**{visibility:.1f} mi**",
+            value=f"{visibility:.1f} mi",
             inline=True
         )
 
         embed.add_field(
             name="🔽 Pressure",
-            value=f"**{pressure} hPa**",
+            value=f"{pressure_inhg:.2f} inHg",
             inline=True
         )
 
-        # Empty field for spacing
-        embed.add_field(name="\u200b", value="\u200b", inline=True)
-
         # Footer
         embed.set_footer(
-            text=f"📍 Zip Code: {zip_code} • Powered by OpenWeatherMap",
+            text=f"Zip: {zip_code} • OpenWeatherMap",
             icon_url="https://openweathermap.org/img/wn/{}@2x.png".format(data['weather'][0]['icon'])
         )
 
@@ -420,8 +419,8 @@ class WeatherModule(BaseModule):
 
         # Create forecast embed
         embed = discord.Embed(
-            title=f"📅 5-Day Forecast for {location}",
-            description="Daily high and low temperatures",
+            title=f"📅 {location}",
+            description="5-Day Forecast",
             color=discord.Color.blue(),
             timestamp=discord.utils.utcnow()
         )
@@ -447,11 +446,8 @@ class WeatherModule(BaseModule):
             # Get emoji for condition
             emoji = weather_emoji.get(day['condition'], '🌤️')
 
-            # Build field value
-            field_value = (
-                f"High: **{day['high']:.0f}°F** | Low: **{day['low']:.0f}°F**\n"
-                f"{day['condition']}"
-            )
+            # Build field value - cleaner format
+            field_value = f"{day['condition']}  •  H: {day['high']:.0f}°  L: {day['low']:.0f}°"
 
             # Add field with day's forecast
             embed.add_field(
@@ -462,7 +458,7 @@ class WeatherModule(BaseModule):
 
         # Footer
         embed.set_footer(
-            text=f"📍 Zip Code: {zip_code} • Powered by OpenWeatherMap"
+            text=f"Zip: {zip_code} • OpenWeatherMap"
         )
 
         await ctx.send(embed=embed)
