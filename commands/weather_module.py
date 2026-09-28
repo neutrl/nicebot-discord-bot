@@ -246,7 +246,9 @@ class WeatherModule(BaseModule):
         # Magnus formula constants
         a = 17.27
         b = 237.7
-        alpha = ((a * temp_c) / (b + temp_c)) + (humidity / 100.0)
+        # Calculate alpha using relative humidity
+        import math
+        alpha = ((a * temp_c) / (b + temp_c)) + math.log(humidity / 100.0)
         dew_point_c = (b * alpha) / (a - alpha)
         # Convert back to Fahrenheit
         dew_point = (dew_point_c * 9/5) + 32
