@@ -201,12 +201,32 @@ class WeatherModule(BaseModule):
             await ctx.send("Please provide a valid 5-digit US zip code")
             return
 
-        # Fetch weather data
+        # Fetch weather data and forecast data (for high/low temps)
         data, error = await self.fetch_weather(zip_code)
 
         if error:
             await ctx.send(f"Error: {error}")
             return
+
+        # Fetch forecast to get today's high/low
+        forecast_data, forecast_error = await self.fetch_forecast(zip_code)
+        today_high = None
+        today_low = None
+
+        if not forecast_error and forecast_data:
+            # Get today's date
+            today = datetime.now().date()
+            today_temps = []
+
+            # Collect all temps for today from forecast
+            for entry in forecast_data['list']:
+                dt_obj = datetime.fromtimestamp(entry['dt']).date()
+                if dt_obj == today:
+                    today_temps.append(entry['main']['temp'])
+
+            if today_temps:
+                today_high = max(today_temps)
+                today_low = min(today_temps)
 
         # Parse weather data
         location = data['name']
@@ -219,6 +239,17 @@ class WeatherModule(BaseModule):
         wind_speed = data['wind']['speed']
         wind_deg = data['wind'].get('deg', 0)
         visibility = data.get('visibility', 0) / 1609.34  # Convert meters to miles
+
+        # Calculate dew point using Magnus formula
+        # Convert Fahrenheit to Celsius for calculation
+        temp_c = (temp - 32) * 5/9
+        # Magnus formula constants
+        a = 17.27
+        b = 237.7
+        alpha = ((a * temp_c) / (b + temp_c)) + (humidity / 100.0)
+        dew_point_c = (b * alpha) / (a - alpha)
+        # Convert back to Fahrenheit
+        dew_point = (dew_point_c * 9/5) + 32
 
         # Get weather emoji based on condition
         weather_emoji = {
@@ -261,9 +292,15 @@ class WeatherModule(BaseModule):
         )
 
         # Main temperature display (bigger, centered)
+        temp_value = f"# {temp:.0f}°F\nFeels like **{feels_like:.0f}°F**"
+
+        # Add high/low if available
+        if today_high is not None and today_low is not None:
+            temp_value += f"\nHigh: **{today_high:.0f}°F** | Low: **{today_low:.0f}°F**"
+
         embed.add_field(
             name="🌡️ Current Temperature",
-            value=f"# {temp:.0f}°F\nFeels like **{feels_like:.0f}°F**",
+            value=temp_value,
             inline=False
         )
 
@@ -272,6 +309,13 @@ class WeatherModule(BaseModule):
         embed.add_field(
             name=f"{humidity_emoji} Humidity",
             value=f"**{humidity}%**",
+            inline=True
+        )
+
+        # Dew Point
+        embed.add_field(
+            name="💧 Dew Point",
+            value=f"**{dew_point:.0f}°F**",
             inline=True
         )
 
